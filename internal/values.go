@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/fatih/color"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks/config"
@@ -62,4 +63,10 @@ func relativeToRepo(paths []string) string {
 		fullpath[ix+1] = elem
 	}
 	return path.Join(fullpath...)
+}
+
+func init() {
+	if val, envset := os.LookupEnv("FORCE_COLOR"); envset && val == "true" {
+		color.NoColor = false
+	}
 }
