@@ -6,7 +6,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/hashicorp/go-multierror"
 	"github.com/wavesoftware/go-ensure"
-	"github.com/wavesoftware/go-magetasks/internal"
 )
 
 type Task struct {
@@ -37,9 +36,9 @@ func StartMultiline(icon, action string) *Task {
 
 func (t *Task) start() {
 	if t.multiline {
-		fmt.Printf("%s %s %s\n", internal.MageTag, t.icon, t.action)
+		fmt.Printf("%s %s %s\n", mageTag(), t.icon, t.action)
 	} else {
-		fmt.Printf("%s %s %s... ", internal.MageTag, t.icon, t.action)
+		fmt.Printf("%s %s %s... ", mageTag(), t.icon, t.action)
 	}
 }
 
@@ -51,13 +50,13 @@ func (t *Task) End(errs ...error) {
 	red := color.New(color.FgHiRed).Add(color.Bold).SprintFunc()
 	if err != nil {
 		if t.multiline {
-			msg = internal.MageTag + red(fmt.Sprintf(" %s have failed!\n", t.action))
+			msg = mageTag() + red(fmt.Sprintf(" %s have failed!\n", t.action))
 		} else {
 			msg = red(fmt.Sprintln("failed!"))
 		}
 	} else {
 		if t.multiline {
-			msg = internal.MageTag + green(fmt.Sprintf(" %s was successful.\n", t.action))
+			msg = mageTag() + green(fmt.Sprintf(" %s was successful.\n", t.action))
 		} else {
 			msg = green(fmt.Sprintln("done."))
 		}

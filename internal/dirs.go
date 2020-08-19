@@ -7,8 +7,8 @@ import (
 	"github.com/wavesoftware/go-ensure"
 )
 
-// ensureBuildDir creates a build directory
-func ensureBuildDir() {
-	d := path.Join(buildDir, "bin")
+// EnsureBuildDir creates a build directory
+func EnsureBuildDir() {
+	d := path.Join(BuildDir(), "bin")
 	ensure.NoError(os.MkdirAll(d, os.ModePerm))
 }

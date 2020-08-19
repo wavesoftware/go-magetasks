@@ -1,6 +1,9 @@
 package magetasks
 
 import (
+	"os"
+	"path"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/internal"
@@ -16,10 +19,22 @@ func Check() {
 
 func revive() error {
 	mg.Deps(internal.BuildDeps)
-	return sh.RunV("revive", "-config", "revive.toml", "-formatter", "stylish", "./...")
+	reviveConfig := path.Join(internal.RepoDir(), "revive.toml")
+	if fileExists(reviveConfig) {
+		return sh.RunV("revive", "-config", "revive.toml", "-formatter", "stylish", "./...")
+	}
+	return nil
 }
 
 func staticcheck() error {
 	mg.Deps(internal.BuildDeps)
 	return sh.RunV("staticcheck", "-f", "stylish", "./...")
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
