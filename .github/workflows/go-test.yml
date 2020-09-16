@@ -1,4 +1,4 @@
-name: Go test
+name: Golang
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 jobs:
 
   build:
-    name: Build
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
