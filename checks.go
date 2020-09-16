@@ -7,10 +7,10 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/internal"
-	"github.com/wavesoftware/go-magetasks/internal/tasks"
+	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
-// Check will run all lints checks
+// Check will run all lints checks.
 func Check() {
 	t := tasks.StartMultiline("🔍", "Checking")
 	mg.Deps(revive, staticcheck)

@@ -7,10 +7,10 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/internal"
-	"github.com/wavesoftware/go-magetasks/internal/tasks"
+	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
-// Test will execute regular unit tests
+// Test will execute regular unit tests.
 func Test() {
 	mg.Deps(Check, internal.EnsureBuildDir)
 	t := tasks.StartMultiline("✅", "Testing")

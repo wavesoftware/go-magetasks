@@ -10,19 +10,23 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks/config"
-	"github.com/wavesoftware/go-magetasks/internal/tasks"
+	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
 var (
 	git                 = sh.OutCmd("git")
 	gitVerCache *string = nil
+
+	// Errors list.
+	errVersionVariableMissing = errors.New("version variable path is unset")
 )
 
-// BuildDir returns project build dir
+// BuildDir returns project build dir.
 func BuildDir() string {
 	return relativeToRepo(config.BuildDirPath)
 }
 
+// RepoDir returns project repo directory.
 func RepoDir() string {
 	if config.RepoDir != "" {
 		return config.RepoDir
@@ -32,6 +36,7 @@ func RepoDir() string {
 	return repoDir
 }
 
+// AppendLdflags will append ldflags with version string.
 func AppendLdflags(args []string, t *tasks.Task) []string {
 	if isVersionVariableSet() {
 		p, err := versionVariablePath()
@@ -51,7 +56,7 @@ func isVersionVariableSet() bool {
 
 func versionVariablePath() (string, error) {
 	if !isVersionVariableSet() {
-		return "", errors.New("version variable path is unset")
+		return "", errVersionVariableMissing
 	}
 	return config.VersionVariablePath, nil
 }

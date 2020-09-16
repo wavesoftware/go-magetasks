@@ -7,10 +7,11 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/internal"
-	"github.com/wavesoftware/go-magetasks/internal/tasks"
+	"github.com/wavesoftware/go-magetasks/pkg/ldflags"
+	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
-// Binary will build a binary executable file
+// Binary will build a binary executable file.
 func Binary() {
 	mg.Deps(Test, internal.EnsureBuildDir)
 	if len(config.Binaries) > 0 {
@@ -20,7 +21,7 @@ func Binary() {
 			args := []string{
 				"build",
 			}
-			args = internal.AppendLdflags(args, t)
+			args = ldflags.AppendGitVersion(args, t)
 			args = append(args, "-o", fullBinaryName(binary), fullBinaryDirectory(binary))
 			err := sh.RunV("go", args...)
 			errs = append(errs, err)
