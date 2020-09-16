@@ -1,4 +1,4 @@
-name: Golangci Lint
+name: Lints
 on:
   push:
     tags:
@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   golangci:
-    name: Lint
+    name: Golangci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,3 +17,13 @@ jobs:
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: v1.31
+  editorconfig:
+    name: EditorConfig
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: ECLint
+        uses: snow-actions/eclint@v1.0.1
+        with:
+          args: check
+
