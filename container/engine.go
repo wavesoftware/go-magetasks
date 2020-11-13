@@ -1,6 +1,7 @@
 package container
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -8,6 +9,12 @@ import (
 	"strings"
 
 	"github.com/wavesoftware/go-magetasks/config"
+)
+
+var (
+	errNoContainerEngineInstalled = errors.New(
+		"can't find a installed container engine (podman or docker)",
+	)
 )
 
 func containerFile(bin config.Binary) string {
@@ -19,7 +26,7 @@ func imageName(bin config.Binary) string {
 	defBasename := fmt.Sprintf("localhost/%s", getenv("USER", "Anonymous"))
 	basename := getenv("CONTAINER_BASENAME", defBasename)
 	if !strings.HasSuffix(basename, "/") {
-		basename = basename + "/"
+		basename += "/"
 	}
 	return basename + bin.Name
 }
@@ -34,9 +41,7 @@ func resolveContainerEngine() (string, error) {
 			return path, nil
 		}
 	}
-	return "", fmt.Errorf(
-		"can't find a installed container engine (podman or docker)",
-	)
+	return "", errNoContainerEngineInstalled
 }
 
 func getenv(key, defValue string) string {

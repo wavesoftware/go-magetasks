@@ -9,7 +9,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
-// Images builds a OCI images of binaries
+// Images builds a OCI images of binaries.
 func Images() {
 	mg.Deps(magetasks.Binary)
 
@@ -25,7 +25,6 @@ func Images() {
 				"-t", imageName(binary),
 				".",
 			}
-			args = append(args)
 			err := sh.RunV(ce, args...)
 			errs = append(errs, err)
 		}

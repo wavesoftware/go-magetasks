@@ -8,7 +8,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
-// Publish will publish built images to a remote registry
+// Publish publishes built images to a remote registry.
 func Publish() {
 	mg.Deps(Images)
 
@@ -21,7 +21,6 @@ func Publish() {
 			args := []string{
 				"push", imageName(binary),
 			}
-			args = append(args)
 			err := sh.RunV(ce, args...)
 			errs = append(errs, err)
 		}
