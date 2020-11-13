@@ -6,6 +6,9 @@ import (
 	// mage:import
 	"github.com/wavesoftware/go-magetasks"
 	"github.com/wavesoftware/go-magetasks/config"
+
+	// mage:import
+	_ "github.com/wavesoftware/go-magetasks/container"
 )
 
 // Default target is set to Binary
