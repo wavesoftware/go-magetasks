@@ -36,9 +36,9 @@ func resolveContainerEngine() (string, error) {
 		"podman", "docker",
 	}
 	for _, candidate := range candidates {
-		path, err := exec.LookPath(candidate)
+		binPath, err := exec.LookPath(candidate)
 		if err == nil {
-			return path, nil
+			return binPath, nil
 		}
 	}
 	return "", errNoContainerEngineInstalled

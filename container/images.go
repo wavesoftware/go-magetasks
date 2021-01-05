@@ -6,6 +6,7 @@ import (
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks"
 	"github.com/wavesoftware/go-magetasks/config"
+	"github.com/wavesoftware/go-magetasks/internal"
 	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
@@ -13,21 +14,26 @@ import (
 func Images() {
 	mg.Deps(magetasks.Binary)
 
-	ce, err := resolveContainerEngine()
-	ensure.NoError(err)
 	if len(config.Binaries) > 0 {
 		t := tasks.StartMultiline("📦", "Packaging OCI images")
 		errs := make([]error, 0)
 		for _, binary := range config.Binaries {
-			args := []string{
-				"build",
-				"-f", containerFile(binary),
-				"-t", imageName(binary),
-				".",
+			cf := containerFile(binary)
+			if internal.DontExists(cf) {
+				continue
 			}
-			err := sh.RunV(ce, args...)
+			args := []string{
+				"build", "-f", cf, "-t", imageName(binary), ".",
+			}
+			err := sh.RunV(containerEngine(), args...)
 			errs = append(errs, err)
 		}
 		t.End(errs...)
 	}
+}
+
+func containerEngine() string {
+	ce, err := resolveContainerEngine()
+	ensure.NoError(err)
+	return ce
 }
