@@ -12,7 +12,7 @@ import (
 func Clean() {
 	t := tasks.Start("🚿", "Cleaning")
 	err := os.RemoveAll(internal.BuildDir())
-	errs := make([]error, 1)
+	errs := make([]error, 0, 1)
 	errs = append(errs, err)
 	for _, task := range config.CleaningTasks {
 		err = task()
