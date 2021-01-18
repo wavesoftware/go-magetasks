@@ -8,12 +8,59 @@ import (
 	"github.com/wavesoftware/go-ensure"
 )
 
+var (
+	red    = color.New(color.FgHiRed).Add(color.Bold).SprintFunc()
+	green  = color.New(color.FgHiGreen).Add(color.Bold).SprintFunc()
+	yellow = color.New(color.FgHiYellow).Add(color.Bold).SprintFunc()
+)
+
 // Task represents a mage task enriched with icon and description that might
 // be multiline.
 type Task struct {
 	icon      string
 	action    string
 	multiline bool
+}
+
+// Part represents a part of a bigger Task.
+type Part struct {
+	name string
+	t    *Task
+}
+
+// PartProcessing is an interface that is used to process long running part of
+// tasks.
+type PartProcessing interface {
+	Done(err error)
+}
+
+// Skip print a warning message.
+func (p *Part) Skip(reason string) {
+	if p.t.multiline {
+		msg := fmt.Sprintf(" %s › %s is skipped due to %s\n", p.t.icon, p.name, reason)
+		fmt.Print(mageTag() + yellow(msg))
+	}
+}
+
+type partProcessing struct {
+	p *Part
+}
+
+// Done is reporting a completeness of part processing.
+func (p *partProcessing) Done(err error) {
+	if p.p.t.multiline && err != nil {
+		msg := fmt.Sprintf("%s have failed: %v\n", p.p.name, err)
+		fmt.Print(mageTag() + red(msg))
+	}
+}
+
+// Starting starts a part processing.
+func (p *Part) Starting() PartProcessing {
+	if p.t.multiline {
+		msg := fmt.Sprintf(" %s › %s\n", p.t.icon, p.name)
+		fmt.Print(mageTag() + msg)
+	}
+	return &partProcessing{p: p}
 }
 
 // Start will start a single line task.
@@ -61,8 +108,15 @@ func (t *Task) End(errs ...error) {
 	ensure.NoError(err)
 }
 
+// Part create a part that can be reported further.
+func (t *Task) Part(part string) *Part {
+	return &Part{
+		name: part,
+		t:    t,
+	}
+}
+
 func erroneousMsg(t *Task) string {
-	red := color.New(color.FgHiRed).Add(color.Bold).SprintFunc()
 	if t.multiline {
 		return mageTag() + red(fmt.Sprintf(" %s have failed!\n", t.action))
 	}
@@ -70,7 +124,6 @@ func erroneousMsg(t *Task) string {
 }
 
 func successfulMsg(t *Task) string {
-	green := color.New(color.FgHiGreen).Add(color.Bold).SprintFunc()
 	if t.multiline {
 		return mageTag() + green(fmt.Sprintf(" %s was successful.\n", t.action))
 	}

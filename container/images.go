@@ -1,6 +1,8 @@
 package container
 
 import (
+	"fmt"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-ensure"
@@ -18,14 +20,18 @@ func Images() {
 		t := tasks.StartMultiline("📦", "Packaging OCI images")
 		errs := make([]error, 0)
 		for _, binary := range config.Binaries {
+			p := t.Part(binary.Name)
 			cf := containerFile(binary)
 			if internal.DontExists(cf) {
+				p.Skip(fmt.Sprintf("containerfile %s don't exist", cf))
 				continue
 			}
+			st := p.Starting()
 			args := []string{
 				"build", "-f", cf, "-t", imageName(binary), ".",
 			}
 			err := sh.RunV(containerEngine(), args...)
+			st.Done(err)
 			errs = append(errs, err)
 		}
 		t.End(errs...)

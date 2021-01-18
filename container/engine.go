@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strings"
+	"regexp"
 
 	"github.com/wavesoftware/go-magetasks/config"
 )
@@ -25,7 +25,8 @@ func containerFile(bin config.Binary) string {
 func imageName(bin config.Binary) string {
 	defBasename := fmt.Sprintf("localhost/%s", getenv("USER", "Anonymous"))
 	basename := getenv("CONTAINER_BASENAME", defBasename)
-	if !strings.HasSuffix(basename, "/") {
+	r := regexp.MustCompile(".+[A-Za-z0-9]$")
+	if r.MatchString(basename) {
 		basename += "/"
 	}
 	return basename + bin.Name
