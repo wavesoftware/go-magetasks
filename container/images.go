@@ -18,7 +18,6 @@ func Images() {
 
 	if len(config.Binaries) > 0 {
 		t := tasks.StartMultiline("📦", "Packaging OCI images")
-		errs := make([]error, 0)
 		for _, binary := range config.Binaries {
 			p := t.Part(binary.Name)
 			cf := containerFile(binary)
@@ -32,9 +31,8 @@ func Images() {
 			}
 			err := sh.RunV(containerEngine(), args...)
 			st.Done(err)
-			errs = append(errs, err)
 		}
-		t.End(errs...)
+		t.End()
 	}
 }
 

@@ -1,6 +1,8 @@
 package container
 
 import (
+	"fmt"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/config"
@@ -16,13 +18,17 @@ func Publish() {
 		t := tasks.StartMultiline("📤", "Publishing OCI images")
 		errs := make([]error, 0)
 		for _, binary := range config.Binaries {
+			p := t.Part(binary.Name)
 			cf := containerFile(binary)
+			im := imageName(binary)
 			if internal.DontExists(cf) {
+				p.Skip(fmt.Sprintf("no container image for %s", im))
 				continue
 			}
-			args := []string{"push", imageName(binary)}
+			ps := p.Starting()
+			args := []string{"push", im}
 			err := sh.RunV(containerEngine(), args...)
-			errs = append(errs, err)
+			ps.Done(err)
 		}
 		t.End(errs...)
 	}

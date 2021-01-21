@@ -3,18 +3,34 @@ package config
 import "github.com/fatih/color"
 
 var (
-	RepoDir      string
+	// RepoDir holds a repository path.
+	RepoDir string
+
+	// BuildDirPath holds a build dir path.
 	BuildDirPath = []string{"build", "_output"}
-	MageTag      = MageTagStruct{
+	// MageTag holds default mage tag settings.
+	MageTag = MageTagStruct{
 		Color: color.FgCyan,
 		Label: "[MAGE]",
 	}
+
+	// Dependencies will hold additional dependencies that needs to be installed
+	// before running tasks.
 	Dependencies = []string{
 		"github.com/kyoh86/richgo",
 		"github.com/mgechev/revive",
 		"honnef.co/go/tools/cmd/staticcheck",
 	}
+
+	// VersionVariablePath a Golang path to version holding variable.
 	VersionVariablePath string
-	Binaries            []Binary
-	CleaningTasks       []CleaningTask
+
+	// Binaries a list of binaries to build.
+	Binaries []Binary
+
+	// CleaningTasks additional cleaning tasks.
+	CleaningTasks []CustomTask
+
+	// Checks holds a list of checks to perform.
+	Checks []CustomTask
 )
