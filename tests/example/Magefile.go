@@ -6,6 +6,8 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+	"github.com/wavesoftware/go-magetasks/pkg/checks"
+
 	// mage:import
 	"github.com/wavesoftware/go-magetasks"
 	"github.com/wavesoftware/go-magetasks/config"
@@ -28,4 +30,5 @@ func init() {
 		config.Binaries = append(config.Binaries, config.Binary{Name: bin})
 	}
 	config.VersionVariablePath = "github.com/wavesoftware/go-magetasks/tests/example/internal.Version"
+	checks.GolangCiLint()
 }

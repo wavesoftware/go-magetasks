@@ -15,8 +15,8 @@ func Clean() {
 	errs := make([]error, 0, 1)
 	errs = append(errs, err)
 	for _, task := range config.CleaningTasks {
-		err = task()
-		errs = append(errs, err)
+		p := t.Part(task.Name)
+		p.Starting().Done(task.Task())
 	}
 	t.End(errs...)
 }

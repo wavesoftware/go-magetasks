@@ -20,6 +20,7 @@ type Task struct {
 	icon      string
 	action    string
 	multiline bool
+	raised    []error
 }
 
 // Part represents a part of a bigger Task.
@@ -48,9 +49,12 @@ type partProcessing struct {
 
 // Done is reporting a completeness of part processing.
 func (p *partProcessing) Done(err error) {
-	if p.p.t.multiline && err != nil {
-		msg := fmt.Sprintf("%s have failed: %v\n", p.p.name, err)
-		fmt.Print(mageTag() + red(msg))
+	if err != nil {
+		if p.p.t.multiline {
+			msg := fmt.Sprintf(" %s %s have failed: %v\n", p.p.t.icon, p.p.name, err)
+			fmt.Print(mageTag() + red(msg))
+		}
+		p.p.t.raised = append(p.p.t.raised, err)
 	}
 }
 
@@ -96,7 +100,10 @@ func (t *Task) start() {
 // End will report task completion, either successful or failures.
 func (t *Task) End(errs ...error) {
 	var msg string
-	merr := multierror.Append(nil, errs...)
+	sum := make([]error, 0, len(errs)+len(t.raised))
+	sum = append(sum, t.raised...)
+	sum = append(sum, errs...)
+	merr := multierror.Append(nil, sum...)
 	err := merr.ErrorOrNil()
 	if err != nil {
 		msg = erroneousMsg(t)
