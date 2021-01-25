@@ -18,17 +18,24 @@ import (
 
 // Default target is set to Binary
 //goland:noinspection GoUnusedGlobalVariable
-var Default = magetasks.Binary
+var Default = magetasks.Binary // nolint:deadcode,unused
 
 func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	bins := []string{"dummy", "other"}
-	for _, bin := range bins {
-		config.Binaries = append(config.Binaries, config.Binary{Name: bin})
-	}
+	addBinary(config.Binary{
+		Name: "dummy",
+		ImageArgs: map[string]string{
+			"DESC": "v0.6.9-Final",
+		},
+	})
+	addBinary(config.Binary{Name: "other"})
 	config.VersionVariablePath = "github.com/wavesoftware/go-magetasks/tests/example/internal.Version"
 	checks.GolangCiLint()
+}
+
+func addBinary(bin config.Binary) {
+	config.Binaries = append(config.Binaries, bin)
 }

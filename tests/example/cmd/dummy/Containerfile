@@ -1,4 +1,7 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal
+ARG DESC
+LABEL description=$DESC \
+  io.k8s.description=$DESC
 
 COPY ./build/_output/bin/dummy /dummy
 CMD ["/dummy"]
