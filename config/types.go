@@ -10,7 +10,8 @@ type MageTagStruct struct {
 
 // Binary represents a binary that will be built.
 type Binary struct {
-	Name string
+	Name      string
+	ImageArgs map[string]string
 }
 
 // CustomTask is a custom function that will be used in the build.

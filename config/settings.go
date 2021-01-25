@@ -18,8 +18,6 @@ var (
 	// before running tasks.
 	Dependencies = []string{
 		"github.com/kyoh86/richgo",
-		"github.com/mgechev/revive",
-		"honnef.co/go/tools/cmd/staticcheck",
 	}
 
 	// VersionVariablePath a Golang path to version holding variable.

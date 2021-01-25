@@ -27,8 +27,13 @@ func Images() {
 			}
 			st := p.Starting()
 			args := []string{
-				"build", "-f", cf, "-t", imageName(binary), ".",
+				"build", "-f", cf, "-t", imageName(binary),
 			}
+			for key, val := range binary.ImageArgs {
+				args = append(args, "--build-arg",
+					fmt.Sprintf("%s=%s", key, val))
+			}
+			args = append(args, ".")
 			err := sh.RunV(containerEngine(), args...)
 			st.Done(err)
 		}
