@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/wavesoftware/go-magetasks/tests/example/internal"
+	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
 )
 
 func main() {
-	fmt.Printf("Dummy code! Version: %s\n", internal.Version)
+	fmt.Printf("Version: %s\nImage: ", metadata.Version)
 }

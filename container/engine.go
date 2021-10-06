@@ -1,3 +1,5 @@
+// +build ignored
+
 package container
 
 import (
@@ -24,7 +26,7 @@ func containerFile(bin config.Binary) string {
 
 func imageName(bin config.Binary) string {
 	defBasename := fmt.Sprintf("localhost/%s", getenv("USER", "Anonymous"))
-	basename := getenv("CONTAINER_BASENAME", defBasename)
+	basename := getenv("IMAGE_BASENAME", defBasename)
 	r := regexp.MustCompile(".+[A-Za-z0-9]$")
 	if r.MatchString(basename) {
 		basename += "/"

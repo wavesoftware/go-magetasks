@@ -1,3 +1,5 @@
+// +build ignored
+
 package container
 
 import (
@@ -6,7 +8,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/config"
-	"github.com/wavesoftware/go-magetasks/internal"
+	"github.com/wavesoftware/go-magetasks/pkg/files"
 	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
@@ -21,7 +23,7 @@ func Publish() {
 			p := t.Part(binary.Name)
 			cf := containerFile(binary)
 			im := imageName(binary)
-			if internal.DontExists(cf) {
+			if files.DontExists(cf) {
 				p.Skip(fmt.Sprintf("no container image for %s", im))
 				continue
 			}

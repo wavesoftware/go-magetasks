@@ -6,12 +6,10 @@ import (
 
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/config"
-	"github.com/wavesoftware/go-magetasks/internal"
+	"github.com/wavesoftware/go-magetasks/pkg/files"
 )
 
-const (
-	golangciLintName = "golangci-lint"
-)
+const golangciLintName = "golangci-lint"
 
 // GolangCiLintOptions contains options for GolangCi Lint.
 type GolangCiLintOptions struct {
@@ -23,30 +21,30 @@ type GolangCiLintOptions struct {
 }
 
 // GolangCiLint will configure golangci-lint in the build.
-func GolangCiLint() {
+func GolangCiLint() config.Task {
 	opts := GolangCiLintOptions{}
-	GolangCiLintWithOptions(opts)
+	return GolangCiLintWithOptions(opts)
 }
 
 // GolangCiLintWithOptions will configure golangci-lint in the build with
 // options.
-func GolangCiLintWithOptions(opts GolangCiLintOptions) {
-	config.Checks = append(config.Checks, config.CustomTask{
+func GolangCiLintWithOptions(opts GolangCiLintOptions) config.Task {
+	return config.Task{
 		Name: golangciLintName,
-		Task: func() error {
+		Operation: func() error {
 			return golangCiLint(opts)
 		},
-	})
+	}
 }
 
 func golangCiLint(opts GolangCiLintOptions) error {
 	configFile := ".golangci.yaml"
-	c := path.Join(internal.RepoDir(), configFile)
-	if internal.DontExists(c) {
+	c := path.Join(files.ProjectDir(), configFile)
+	if files.DontExists(c) {
 		fmt.Printf("%s file don't exists. Skipping.\n", configFile)
 		return nil
 	}
-	if !internal.ExecutableAvailable(golangciLintName) {
+	if !files.ExecutableAvailable(golangciLintName) {
 		fmt.Printf("%s executable isn't available on system PATH's."+
 			" Skipping.\n", golangciLintName)
 		return nil
