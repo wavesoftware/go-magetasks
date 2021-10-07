@@ -24,5 +24,8 @@ func FillInDefaultValues(cfg Config) Config {
 	if cfg.Context == nil {
 		cfg.Context = context.TODO()
 	}
+	if cfg.Artifacts == nil {
+		cfg.Artifacts = make(map[string]Artifact)
+	}
 	return cfg
 }

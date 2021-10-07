@@ -22,5 +22,7 @@ func (i Image) Build(name string) config.BuildResult {
 
 func ImageReferenceOf(_ Image) config.Resolver {
 	// TODO: not yet implemented
-	return nil
+	return func() string {
+		return "tbd"
+	}
 }

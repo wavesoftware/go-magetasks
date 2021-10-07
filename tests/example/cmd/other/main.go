@@ -7,5 +7,6 @@ import (
 )
 
 func main() {
-	fmt.Printf("Version: %s\nImage: ", metadata.Version)
+	fmt.Printf("Version: %s\nImage: %s\n",
+		metadata.Version, metadata.Image)
 }

@@ -15,6 +15,7 @@ type MageTag struct {
 	Label string
 }
 
+// BuildResult hold a result of an Artifact build.
 type BuildResult struct {
 	Error error
 	Info  map[string]string
@@ -24,15 +25,19 @@ func (r BuildResult) Failed() bool {
 	return r.Error != nil
 }
 
+// Artifact represents a thing that can be built and published.
 type Artifact interface {
 	Build(name string) BuildResult
 }
 
+// Version specifies the version information and how to set it into variable at
+// compile time.
 type Version struct {
 	Path string
 	Resolver
 }
 
+// Metadata holds additional contextual information.
 type Metadata struct {
 	Args map[string]Resolver
 }

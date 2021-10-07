@@ -8,10 +8,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/config"
 )
 
-type cacheKey struct {
-	ref interface{}
-	key string
-}
+var cacheKey = struct{}{}
 
 // Version returns a git version string.
 func Version() string {
@@ -25,21 +22,13 @@ func Version() string {
 	return version
 }
 
-func gitVersionCacheKey() cacheKey {
-	return cacheKey{
-		ref: config.Actual(), key: "ctx.gitVersion",
-	}
-}
-
 func saveInContext(version string) {
 	config.WithContext(func(ctx context.Context) context.Context {
-		key := gitVersionCacheKey()
-		return context.WithValue(ctx, key, version)
+		return context.WithValue(ctx, cacheKey, version)
 	})
 }
 
 func fromContext() (string, bool) {
-	key := gitVersionCacheKey()
-	ver, ok := config.Actual().Context.Value(key).(string)
+	ver, ok := config.Actual().Context.Value(cacheKey).(string)
 	return ver, ok
 }

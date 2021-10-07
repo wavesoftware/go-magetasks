@@ -17,7 +17,9 @@ type Builder interface {
 
 // NewBuilder creates a new builder.
 func NewBuilder() Builder {
-	return &defaultBuilder{}
+	return &defaultBuilder{
+		resolvers: make(map[string]config.Resolver),
+	}
 }
 
 type defaultBuilder struct {
@@ -30,10 +32,12 @@ func (d *defaultBuilder) Add(name string, resolver config.Resolver) Builder {
 }
 
 func (d *defaultBuilder) Build(args []string) []string {
-	collected := make([]string, 1, len(d.resolvers)+1)
-	collected[0] = "-ldflags=-X"
-	for name, resolver := range d.resolvers {
-		collected = append(collected, fmt.Sprintf("%s=%s", name, resolver()))
+	if len(args) == 0 {
+		return args
 	}
-	return append(args, strings.Join(collected, " "))
+	collected := make([]string, 0, len(d.resolvers))
+	for name, resolver := range d.resolvers {
+		collected = append(collected, fmt.Sprintf("-X %s=%s", name, resolver()))
+	}
+	return append(args, "-ldflags", strings.Join(collected, " "))
 }

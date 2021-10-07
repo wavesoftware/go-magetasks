@@ -21,7 +21,7 @@ type Binary struct {
 }
 
 func (b Binary) Build(name string) config.BuildResult {
-	info := map[string]string{}
+	info := make(map[string]string)
 	var err error
 	for _, platform := range b.Platforms {
 		var bin string
