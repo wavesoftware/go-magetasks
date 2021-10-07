@@ -11,15 +11,17 @@ import (
 )
 
 func TestProjectBuild(t *testing.T) {
-	c := exec.Command("./mage", "clean", "build")
-	c.Dir = "./example"
-	c.Stdout = os.Stdout
-	err := c.Run()
-	assert.NilError(t, err)
-	c = exec.Command(fmt.Sprintf("./dummy-%s-%s",
+	execCmd(t, "./example", "./mage", "clean", "build")
+	execCmd(t, "./example/build/_output/bin", fmt.Sprintf("./dummy-%s-%s",
 		runtime.GOOS, runtime.GOARCH))
-	c.Dir = "./example/build/_output/bin"
+}
+
+func execCmd(tb testing.TB, dir, name string, args ...string) {
+	tb.Helper()
+	c := exec.Command(name, args...)
+	c.Dir = dir
 	c.Stdout = os.Stdout
-	err = c.Run()
-	assert.NilError(t, err)
+	c.Stderr = os.Stderr
+	err := c.Run()
+	assert.NilError(tb, err)
 }

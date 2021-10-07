@@ -74,9 +74,6 @@ type Config struct {
 	// Overrides holds a list of overrides of this configuration.
 	Overrides []Configurator
 
-	// Default task to run.
-	Default func()
-
 	// context.Context is standard Golang context.
 	context.Context
 }
@@ -92,6 +89,4 @@ type Configurable interface {
 }
 
 // Configured represents a configured project.
-type Configured interface {
-	Default() func()
-}
+type Configured interface{}

@@ -25,6 +25,10 @@ linters:
     - maligned
     - interfacer
     - golint
+    - deadcode
+    - gochecknoglobals
+    - forbidigo
+    - wrapcheck
 
 issues:
   exclude-rules:

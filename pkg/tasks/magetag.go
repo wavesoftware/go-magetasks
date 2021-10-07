@@ -6,5 +6,6 @@ import (
 )
 
 func mageTag() string {
-	return color.New(config.MageTag.Color).Sprint(config.MageTag.Label)
+	mt := config.Actual().MageTag
+	return color.New(mt.Color).Sprint(mt.Label)
 }

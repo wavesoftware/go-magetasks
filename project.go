@@ -5,12 +5,12 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/output"
 )
 
-// Project will set up a project to be built.
-func Project(cfg config.Config) config.Configured {
+// Configure will set up a project to be built.
+func Configure(cfg config.Config) {
 	cfg = config.FillInDefaultValues(cfg)
 	p := project{cfg: &cfg}
 	output.SetupColorMode()
-	return config.Configure(p)
+	config.Configure(p)
 }
 
 type project struct {

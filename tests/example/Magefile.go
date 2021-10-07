@@ -1,23 +1,26 @@
+//go:build mage
 // +build mage
 
 package main
 
 import (
+
+	// mage:import
+	"github.com/wavesoftware/go-magetasks"
+	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact/platform"
 	"github.com/wavesoftware/go-magetasks/pkg/checks"
 	"github.com/wavesoftware/go-magetasks/pkg/git"
 	"github.com/wavesoftware/go-magetasks/tests/example/overrides"
 	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
-
-	// mage:import
-	"github.com/wavesoftware/go-magetasks"
-	"github.com/wavesoftware/go-magetasks/config"
 )
 
 // Default target is set to Build
 //goland:noinspection GoUnusedGlobalVariable
-var Default = func() func() {
+var Default = magetasks.Build
+
+func init() { //nolint:gochecknoinits
 	dummy := artifact.Image{
 		Metadata: config.Metadata{
 			Args: map[string]config.Resolver{
@@ -46,7 +49,7 @@ var Default = func() func() {
 			{OS: platform.Windows, Architecture: platform.AMD64},
 		},
 	}
-	return magetasks.Project(config.Config{
+	magetasks.Configure(config.Config{
 		Version: &config.Version{
 			Path: metadata.VersionPath(), Resolver: git.Version,
 		},
@@ -59,7 +62,6 @@ var Default = func() func() {
 			checks.Revive(),
 			checks.Staticcheck(),
 		},
-		Default:   magetasks.Build,
 		Overrides: overrides.List,
-	}).Default()
-}()
+	})
+}

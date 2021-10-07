@@ -22,13 +22,10 @@ func WithContext(mutator func(ctx context.Context) context.Context) {
 }
 
 // Configure with provided Configurable.
-func Configure(c Configurable) Configured {
+func Configure(c Configurable) {
 	state = c
 	for _, override := range collectConfigurators(c) {
 		override.Configure(state)
-	}
-	return configured{
-		defaultTask: c.Config().Default,
 	}
 }
 
@@ -48,12 +45,4 @@ func collectConfigurators(c Configurable) []Configurator {
 		cnfrs = append(cnfrs, task.Overrides...)
 	}
 	return cnfrs
-}
-
-type configured struct {
-	defaultTask func()
-}
-
-func (c configured) Default() func() {
-	return c.defaultTask
 }

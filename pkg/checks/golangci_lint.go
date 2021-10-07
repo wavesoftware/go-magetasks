@@ -38,10 +38,9 @@ func GolangCiLintWithOptions(opts GolangCiLintOptions) config.Task {
 }
 
 func golangCiLint(opts GolangCiLintOptions) error {
-	configFile := ".golangci.yaml"
-	c := path.Join(files.ProjectDir(), configFile)
-	if files.DontExists(c) {
-		fmt.Printf("%s file don't exists. Skipping.\n", configFile)
+	configFiles := []string{".golangci.yaml", ".golangci.yml"}
+	if configFilesMissing(configFiles) {
+		fmt.Printf("%s file(s) missing. Skipping.\n", configFiles)
 		return nil
 	}
 	if !files.ExecutableAvailable(golangciLintName) {
@@ -59,4 +58,14 @@ func golangCiLint(opts GolangCiLintOptions) error {
 	}
 	args = append(args, "./...")
 	return sh.RunV(golangciLintName, args...)
+}
+
+func configFilesMissing(configFiles []string) bool {
+	for _, file := range configFiles {
+		c := path.Join(files.ProjectDir(), file)
+		if !files.DontExists(c) {
+			return false
+		}
+	}
+	return true
 }
