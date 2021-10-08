@@ -4,12 +4,15 @@ import (
 	"os"
 	"path"
 
+	"github.com/magefile/mage/mg"
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks/config"
+	"github.com/wavesoftware/go-magetasks/pkg/output"
 )
 
 // EnsureBuildDir creates a build directory.
 func EnsureBuildDir() {
+	mg.Deps(output.Setup)
 	d := path.Join(BuildDir(), "bin")
 	ensure.NoError(os.MkdirAll(d, os.ModePerm))
 }

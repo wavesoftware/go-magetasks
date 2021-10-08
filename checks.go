@@ -10,7 +10,7 @@ import (
 // Check will run all lints checks.
 func Check() {
 	mg.Deps(deps.Install)
-	t := tasks.StartMultiline("🔍", "Checking")
+	t := tasks.Start("🔍", "Checking", len(config.Actual().Checks) > 0)
 	for _, check := range config.Actual().Checks {
 		p := t.Part(check.Name)
 		ps := p.Starting()

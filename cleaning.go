@@ -10,7 +10,7 @@ import (
 
 // Clean will clean project files.
 func Clean() {
-	t := tasks.Start("🚿", "Cleaning")
+	t := tasks.Start("🚿", "Cleaning", len(config.Actual().Cleaning) > 0)
 	err := os.RemoveAll(files.BuildDir())
 	errs := make([]error, 0, 1)
 	errs = append(errs, err)

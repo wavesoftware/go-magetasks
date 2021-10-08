@@ -15,7 +15,7 @@ import (
 // Test will execute regular unit tests.
 func Test() {
 	mg.Deps(Check, files.EnsureBuildDir)
-	t := tasks.StartMultiline("✅", "Testing")
+	t := tasks.Start("✅", "Testing", true)
 	cmd := "richgo"
 	if color.NoColor {
 		cmd = "go"

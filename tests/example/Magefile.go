@@ -23,6 +23,7 @@ var Default = magetasks.Build
 func init() { //nolint:gochecknoinits
 	dummy := artifact.Image{
 		Metadata: config.Metadata{
+			Name: "dummy",
 			Args: map[string]config.Resolver{
 				"DESC": func() string {
 					return "A dummy image"
@@ -35,6 +36,7 @@ func init() { //nolint:gochecknoinits
 	}
 	other := artifact.Binary{
 		Metadata: config.Metadata{
+			Name: "other",
 			Args: map[string]config.Resolver{
 				metadata.ImagePath(): artifact.ImageReferenceOf(dummy),
 			},
@@ -53,9 +55,8 @@ func init() { //nolint:gochecknoinits
 		Version: &config.Version{
 			Path: metadata.VersionPath(), Resolver: git.Version,
 		},
-		Artifacts: map[string]config.Artifact{
-			"dummy": dummy,
-			"other": other,
+		Artifacts: []config.Artifact{
+			dummy, other,
 		},
 		Checks: []config.Task{
 			checks.GolangCiLint(),

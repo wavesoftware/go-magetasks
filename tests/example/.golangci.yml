@@ -27,7 +27,6 @@ linters:
     - golint
     - deadcode
     - gochecknoglobals
-    - forbidigo
     - wrapcheck
 
 issues:

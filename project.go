@@ -2,15 +2,16 @@ package magetasks
 
 import (
 	"github.com/wavesoftware/go-magetasks/config"
-	"github.com/wavesoftware/go-magetasks/pkg/output"
+	"github.com/wavesoftware/go-magetasks/pkg/artifact"
 )
 
 // Configure will set up a project to be built.
 func Configure(cfg config.Config) {
+	artifact.ConfigureDefaults()
 	cfg = config.FillInDefaultValues(cfg)
-	p := project{cfg: &cfg}
-	output.SetupColorMode()
-	config.Configure(p)
+	config.Configure(project{
+		cfg: &cfg,
+	})
 }
 
 type project struct {
