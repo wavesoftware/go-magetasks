@@ -52,7 +52,11 @@ func (b Binary) buildForPlatform(platform Platform, name string) (string, error)
 	}
 	binary := fullBinaryName(platform, name)
 	args = append(args, "-o", binary, fullBinaryDirectory(name))
-	err := sh.RunV("go", args...)
+	env := map[string]string{
+		"GOOS":   string(platform.OS),
+		"GOARCH": string(platform.Architecture),
+	}
+	err := sh.RunWithV(env, "go", args...)
 	if err != nil {
 		err = fmt.Errorf("%w: %v", ErrGoBuildFailed, err)
 	}
