@@ -116,7 +116,7 @@ func (t *Task) Part(part string) *Part {
 
 func erroneousMsg(t *Task) {
 	if t.multiline {
-		output.Println(color.Red(fmt.Sprintf("%s have failed!", t.action)))
+		output.Println(color.Red(fmt.Sprintf("%s %s have failed!", t.icon, t.action)))
 	} else {
 		output.PrintEnd(color.Red("failed!"))
 	}
@@ -124,7 +124,7 @@ func erroneousMsg(t *Task) {
 
 func successfulMsg(t *Task) {
 	if t.multiline {
-		output.Println(color.Green(fmt.Sprintf("%s was successful.", t.action)))
+		output.Println(color.Green(fmt.Sprintf("%s %s was successful.", t.icon, t.action)))
 	} else {
 		output.PrintEnd(color.Green("done."))
 	}

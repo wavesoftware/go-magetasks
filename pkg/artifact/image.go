@@ -30,7 +30,11 @@ func ImageReferenceOf(img Image) config.Resolver {
 		if !ok {
 			return noImageReference(img)
 		}
-		return ref
+		str, ok := ref.(string)
+		if !ok {
+			return noImageReference(img)
+		}
+		return str
 	}
 }
 

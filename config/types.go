@@ -62,7 +62,7 @@ type Builder interface {
 // Publisher publishes artifacts to a remote site.
 type Publisher interface {
 	Accepts(artifact Artifact) bool
-	Publish(artifact Artifact) Result
+	Publish(artifact Artifact, notifier Notifier) Result
 }
 
 // Resolver is a func that resolves to a string.
@@ -77,7 +77,7 @@ type MageTag struct {
 // Result hold a result of an Artifact build or publish.
 type Result struct {
 	Error error
-	Info  map[string]string
+	Info  map[string]interface{}
 }
 
 // Failed returns true if the artifact processing failed.

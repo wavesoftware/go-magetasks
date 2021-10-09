@@ -8,4 +8,7 @@ func ConfigureDefaults() {
 		BinaryBuilder{},
 		KoBuilder{},
 	)
+	config.DefaultPublishers = append(config.DefaultPublishers,
+		KoPublisher{},
+	)
 }

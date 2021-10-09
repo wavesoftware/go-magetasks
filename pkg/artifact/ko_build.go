@@ -14,10 +14,13 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-const koImportPath = "ko.import-path"
+const (
+	koImportPath  = "ko.import.path"
+	koBuildResult = "ko.build.result"
+)
 
-// ErrKoBuildFailed when th Google's ko fails to build.
-var ErrKoBuildFailed = errors.New("ko build failed")
+// ErrKoFailed when th Google's ko fails to build.
+var ErrKoFailed = errors.New("ko failed")
 
 // KoBuilder builds images with Google's KO.
 type KoBuilder struct{}
@@ -36,29 +39,30 @@ func (kb KoBuilder) Build(artifact config.Artifact, notifier config.Notifier) co
 	ctx := config.Actual().Context
 	builder, err := commands.NewBuilder(ctx, bo)
 	if err != nil {
-		return resultErrKoBuildFailed(err)
+		return resultErrKoFailed(err)
 	}
 	importPath, err := imageImportPath(image)
 	if err != nil {
-		return resultErrKoBuildFailed(err)
+		return resultErrKoFailed(err)
 	}
 	result, err := builder.Build(ctx, importPath)
 	if err != nil {
-		return resultErrKoBuildFailed(err)
+		return resultErrKoFailed(err)
 	}
 	digest, err := result.Digest()
 	if err != nil {
-		return resultErrKoBuildFailed(err)
+		return resultErrKoFailed(err)
 	}
 	notifier.Notify(fmt.Sprintf("built image: %s", digest))
-	return config.Result{Info: map[string]string{
+	return config.Result{Info: map[string]interface{}{
 		imageReferenceKey: digest.String(),
+		koBuildResult:     result,
 	}}
 }
 
-func resultErrKoBuildFailed(err error) config.Result {
+func resultErrKoFailed(err error) config.Result {
 	return config.Result{
-		Error: fmt.Errorf("%w: %v", ErrKoBuildFailed, err),
+		Error: fmt.Errorf("%w: %v", ErrKoFailed, err),
 	}
 }
 
@@ -95,7 +99,7 @@ func lookForGoModule(dir string) (lookupGoModuleResult, error) {
 		rs.module = file
 		return rs, nil
 	}
-	return rs, fmt.Errorf("%w: can't find go module", ErrKoBuildFailed)
+	return rs, fmt.Errorf("%w: can't find go module", ErrKoFailed)
 }
 
 type lookupGoModuleResult struct {

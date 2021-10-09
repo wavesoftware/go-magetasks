@@ -13,9 +13,9 @@ import (
 )
 
 // ErrNoBuilderForArtifact when no builder for artifact is found.
-var ErrNoBuilderForArtifact = errors.New("no builder for artifact")
+var ErrNoBuilderForArtifact = errors.New("no builder for artifact found")
 
-// Build all expected artifacts.
+// Build will build project artifacts, binaries and images.
 func Build() {
 	mg.Deps(Test, files.EnsureBuildDir)
 	t := tasks.Start("🔨", "Building", len(config.Actual().Artifacts) > 0)
@@ -46,7 +46,7 @@ func buildArtifact(art config.Artifact, pp tasks.PartProcessing) {
 	}
 	var err error
 	if !found {
-		err = fmt.Errorf("%w: %s", ErrNoBuilderForArtifact, art.GetName())
+		err = ErrNoBuilderForArtifact
 	}
 	pp.Done(err)
 }

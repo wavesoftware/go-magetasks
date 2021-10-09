@@ -11,8 +11,13 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/ldflags"
 )
 
-// ResultBinaries is used to cache results of building a binaries.
-const ResultBinaries = "binaries"
+const (
+	// ResultBuilt is used to cache results of building the artifacts.
+	ResultBuilt = "built"
+
+	// ResultPublication is used to cache results of publication of artifacts.
+	ResultPublication = "publication"
+)
 
 var (
 	// ErrGoBuildFailed when go fails to build the project.
@@ -45,7 +50,7 @@ func (bb BinaryBuilder) Build(artifact config.Artifact, notifier config.Notifier
 	if !ok {
 		return config.Result{Error: ErrInvalidArtifact}
 	}
-	info := make(map[string]string)
+	info := make(map[string]interface{})
 	var err error
 	for _, platform := range b.Platforms {
 		var bin string
@@ -62,7 +67,13 @@ func (bb BinaryBuilder) Build(artifact config.Artifact, notifier config.Notifier
 // BuildKey returns the config.ResultKey for a build command.
 func BuildKey(artifact config.Artifact) config.ResultKey {
 	return config.ResultKey(fmt.Sprintf("%s-%s-%s",
-		artifact.GetType(), artifact.GetName(), ResultBinaries))
+		artifact.GetType(), artifact.GetName(), ResultBuilt))
+}
+
+// PublishKey returns the config.ResultKey for a publish command.
+func PublishKey(artifact config.Artifact) config.ResultKey {
+	return config.ResultKey(fmt.Sprintf("%s-%s-%s",
+		artifact.GetType(), artifact.GetName(), ResultPublication))
 }
 
 func (b Binary) buildForPlatform(
