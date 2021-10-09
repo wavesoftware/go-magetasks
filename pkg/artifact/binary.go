@@ -28,6 +28,10 @@ type Binary struct {
 	Platforms []Platform
 }
 
+func (b Binary) GetType() string {
+	return "📦"
+}
+
 // BinaryBuilder is a regular binary Golang builder.
 type BinaryBuilder struct{}
 
@@ -57,9 +61,8 @@ func (bb BinaryBuilder) Build(artifact config.Artifact, notifier config.Notifier
 
 // BuildKey returns the config.ResultKey for a build command.
 func BuildKey(artifact config.Artifact) config.ResultKey {
-	return config.ResultKey{
-		Artifact: artifact, Name: ResultBinaries,
-	}
+	return config.ResultKey(fmt.Sprintf("%s-%s-%s",
+		artifact.GetType(), artifact.GetName(), ResultBinaries))
 }
 
 func (b Binary) buildForPlatform(

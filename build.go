@@ -20,7 +20,7 @@ func Build() {
 	mg.Deps(Test, files.EnsureBuildDir)
 	t := tasks.Start("🔨", "Building", len(config.Actual().Artifacts) > 0)
 	for _, art := range config.Actual().Artifacts {
-		p := t.Part(art.GetName())
+		p := t.Part(fmt.Sprintf("%s %s", art.GetType(), art.GetName()))
 		pp := p.Starting()
 
 		buildArtifact(art, pp)
@@ -39,11 +39,10 @@ func buildArtifact(art config.Artifact, pp tasks.PartProcessing) {
 		if result.Failed() {
 			pp.Done(result.Error)
 			return
-		} else {
-			config.WithContext(func(ctx context.Context) context.Context {
-				return context.WithValue(ctx, artifact.BuildKey(art), result)
-			})
 		}
+		config.WithContext(func(ctx context.Context) context.Context {
+			return context.WithValue(ctx, artifact.BuildKey(art), result)
+		})
 	}
 	var err error
 	if !found {

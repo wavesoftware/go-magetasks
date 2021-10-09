@@ -87,14 +87,12 @@ func (r Result) Failed() bool {
 
 // Artifact represents a thing that can be built and published.
 type Artifact interface {
+	GetType() string
 	GetName() string
 }
 
-// ResultKey represents a key to be used for caching artifact results.
-type ResultKey struct {
-	Artifact
-	Name string
-}
+// ResultKey is used to store results of a build or publish.
+type ResultKey string
 
 // Version specifies the version information and how to set it into variable at
 // compile time.

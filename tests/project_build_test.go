@@ -12,7 +12,7 @@ import (
 
 func TestProjectBuild(t *testing.T) {
 	execCmd(t, "./example", "./mage", "clean", "build")
-	execCmd(t, "./example/build/_output/bin", fmt.Sprintf("./dummy-%s-%s",
+	execCmd(t, "./example/build/_output/bin", fmt.Sprintf("./other-%s-%s",
 		runtime.GOOS, runtime.GOARCH))
 }
 
