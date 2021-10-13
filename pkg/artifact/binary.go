@@ -9,6 +9,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/files"
 	"github.com/wavesoftware/go-magetasks/pkg/ldflags"
+	"github.com/wavesoftware/go-magetasks/pkg/output/color"
 )
 
 const (
@@ -17,6 +18,9 @@ const (
 
 	// ResultPublication is used to cache results of publication of artifacts.
 	ResultPublication = "publication"
+
+	// BinariesByPlatform is used to assign built binary to a platform.
+	BinariesByPlatform = "binary.by-platform"
 )
 
 var (
@@ -51,29 +55,22 @@ func (bb BinaryBuilder) Build(artifact config.Artifact, notifier config.Notifier
 		return config.Result{Error: ErrInvalidArtifact}
 	}
 	info := make(map[string]interface{})
+	artifacts := make([]string, 0, len(b.Platforms))
+	byPlatform := make(map[Platform]string)
 	var err error
-	for _, platform := range b.Platforms {
+	for _, pltfrm := range b.Platforms {
 		var bin string
-		bin, err = b.buildForPlatform(platform, artifact.GetName(), notifier)
+		bin, err = b.buildForPlatform(pltfrm, artifact.GetName(), notifier)
 		if err == nil {
-			info[fmt.Sprintf("%s-%s", platform.OS, platform.Architecture)] = bin
+			artifacts = append(artifacts, bin)
+			byPlatform[pltfrm] = bin
 		} else {
 			break
 		}
 	}
+	info[ArtifactsBuilt] = artifacts
+	info[BinariesByPlatform] = byPlatform
 	return config.Result{Error: err, Info: info}
-}
-
-// BuildKey returns the config.ResultKey for a build command.
-func BuildKey(artifact config.Artifact) config.ResultKey {
-	return config.ResultKey(fmt.Sprintf("%s-%s-%s",
-		artifact.GetType(), artifact.GetName(), ResultBuilt))
-}
-
-// PublishKey returns the config.ResultKey for a publish command.
-func PublishKey(artifact config.Artifact) config.ResultKey {
-	return config.ResultKey(fmt.Sprintf("%s-%s-%s",
-		artifact.GetType(), artifact.GetName(), ResultPublication))
 }
 
 func (b Binary) buildForPlatform(
@@ -101,8 +98,9 @@ func (b Binary) buildForPlatform(
 		"GOOS":   string(platform.OS),
 		"GOARCH": string(platform.Architecture),
 	}
-	notifier.Notify(fmt.Sprintf("go build (%s-%s)",
-		platform.OS, platform.Architecture))
+	notifier.Notify(fmt.Sprintf("go build (%s)",
+		color.Blue(fmt.Sprintf("%s-%s", platform.OS, platform.Architecture)),
+	))
 	err := sh.RunWithV(env, "go", args...)
 	if err != nil {
 		err = fmt.Errorf("%w: %v", ErrGoBuildFailed, err)

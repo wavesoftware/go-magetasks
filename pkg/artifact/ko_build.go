@@ -7,10 +7,13 @@ import (
 	"path"
 	"strings"
 
+	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/google/ko/pkg/build"
 	"github.com/google/ko/pkg/commands"
 	"github.com/google/ko/pkg/commands/options"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/files"
+	"github.com/wavesoftware/go-magetasks/pkg/output/color"
 	"golang.org/x/mod/modfile"
 )
 
@@ -49,15 +52,38 @@ func (kb KoBuilder) Build(artifact config.Artifact, notifier config.Notifier) co
 	if err != nil {
 		return resultErrKoFailed(err)
 	}
-	digest, err := result.Digest()
+	ref, err := calculateImageReference(result, artifact)
 	if err != nil {
 		return resultErrKoFailed(err)
 	}
-	notifier.Notify(fmt.Sprintf("built image: %s", digest))
+	notifier.Notify(fmt.Sprintf("built image: %s", color.Blue(ref)))
 	return config.Result{Info: map[string]interface{}{
-		imageReferenceKey: digest.String(),
+		imageReferenceKey: ref.String(),
 		koBuildResult:     result,
 	}}
+}
+
+func calculateImageReference(result build.Result, artifact config.Artifact) (name.Reference, error) {
+	kp := KoPublisher{}
+	po, err := kp.publishOptions()
+	if err != nil {
+		return nil, err
+	}
+	po.Push = false
+	po.TarballFile = ""
+	po.OCILayoutPath = ""
+	po.Local = false
+	publisher, err := commands.NewPublisher(po)
+	if err != nil {
+		return nil, err
+	}
+	defer closePublisher(publisher)
+	ctx := config.Actual().Context
+	ref, err := publisher.Publish(ctx, result, artifact.GetName())
+	if err != nil {
+		return nil, err
+	}
+	return ref, nil
 }
 
 func resultErrKoFailed(err error) config.Result {

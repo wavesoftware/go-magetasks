@@ -44,8 +44,6 @@ func init() { //nolint:gochecknoinits
 		Platforms: []artifact.Platform{
 			{OS: platform.Linux, Architecture: platform.AMD64},
 			{OS: platform.Linux, Architecture: platform.ARM64},
-			{OS: platform.Linux, Architecture: platform.S390X},
-			{OS: platform.Linux, Architecture: platform.PPC64LE},
 			{OS: platform.Mac, Architecture: platform.AMD64},
 			{OS: platform.Mac, Architecture: platform.ARM64},
 			{OS: platform.Windows, Architecture: platform.AMD64},

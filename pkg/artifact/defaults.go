@@ -9,6 +9,7 @@ func ConfigureDefaults() {
 		KoBuilder{},
 	)
 	config.DefaultPublishers = append(config.DefaultPublishers,
+		ListPublisher{},
 		KoPublisher{},
 	)
 }
