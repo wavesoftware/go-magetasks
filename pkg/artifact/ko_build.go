@@ -13,6 +13,7 @@ import (
 	"github.com/google/ko/pkg/commands/options"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/files"
+	"github.com/wavesoftware/go-magetasks/pkg/ldflags"
 	"github.com/wavesoftware/go-magetasks/pkg/output/color"
 	"golang.org/x/mod/modfile"
 )
@@ -38,13 +39,17 @@ func (kb KoBuilder) Build(artifact config.Artifact, notifier config.Notifier) co
 	if !ok {
 		return config.Result{Error: ErrInvalidArtifact}
 	}
-	bo := &options.BuildOptions{}
-	ctx := config.Actual().Context
-	builder, err := commands.NewBuilder(ctx, bo)
+	importPath, err := imageImportPath(image)
 	if err != nil {
 		return resultErrKoFailed(err)
 	}
-	importPath, err := imageImportPath(image)
+	bo := &options.BuildOptions{
+		Platform: buildPlatformString(image),
+		Labels:   buildLabels(image, importPath),
+	}
+	fillInLdflags(bo, importPath, image)
+	ctx := config.Actual().Context
+	builder, err := commands.NewBuilder(ctx, bo)
 	if err != nil {
 		return resultErrKoFailed(err)
 	}
@@ -61,6 +66,49 @@ func (kb KoBuilder) Build(artifact config.Artifact, notifier config.Notifier) co
 		imageReferenceKey: ref.String(),
 		koBuildResult:     result,
 	}}
+}
+
+func fillInLdflags(bo *options.BuildOptions, importPath string, image Image) {
+	version := config.Actual().Version
+	args := make([]string, 0)
+	if version != nil || len(image.BuildVariables) > 0 {
+		builder := ldflags.NewBuilder()
+		if version != nil {
+			builder.Add(version.Path, version.Resolver)
+		}
+		for key, resolver := range image.BuildVariables {
+			builder.Add(key, resolver)
+		}
+		args = builder.Build()
+	}
+	if len(args) > 0 {
+		bo.BuildConfigs = map[string]build.Config{
+			importPath: {
+				ID:      "ldflags-config",
+				Ldflags: args,
+			},
+		}
+	}
+}
+
+func buildLabels(image Image, importPath string) []string {
+	labels := make([]string, 0, len(image.Labels))
+	if version := config.Actual().Version; version != nil {
+		labels = append(labels, fmt.Sprintf("version=%s", version.Resolver()))
+	}
+	labels = append(labels, fmt.Sprintf("%s=%s", koImportPath, importPath))
+	for key, resolver := range image.Labels {
+		labels = append(labels, fmt.Sprintf("%s=%s", key, resolver()))
+	}
+	return labels
+}
+
+func buildPlatformString(im Image) string {
+	platforms := make([]string, len(im.Architectures))
+	for i, architecture := range im.Architectures {
+		platforms[i] = fmt.Sprintf("linux/%s", architecture)
+	}
+	return strings.Join(platforms, ",")
 }
 
 func calculateImageReference(result build.Result, artifact config.Artifact) (name.Reference, error) {
@@ -99,7 +147,7 @@ func imageImportPath(image Image) (string, error) {
 		return "", err
 	}
 	importPath := rs.resolve(binDir)
-	if resolver, ok := image.Args[koImportPath]; ok {
+	if resolver, ok := image.Labels[koImportPath]; ok {
 		importPath = resolver()
 	}
 	return importPath, nil

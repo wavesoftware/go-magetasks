@@ -82,15 +82,15 @@ func (b Binary) buildForPlatform(
 		"build",
 	}
 	version := config.Actual().Version
-	if version != nil || len(b.Args) > 0 {
+	if version != nil || len(b.BuildVariables) > 0 {
 		builder := ldflags.NewBuilder()
 		if version != nil {
 			builder.Add(version.Path, version.Resolver)
 		}
-		for key, resolver := range b.Args {
+		for key, resolver := range b.BuildVariables {
 			builder.Add(key, resolver)
 		}
-		args = builder.Build(args)
+		args = builder.BuildOnto(args)
 	}
 	binary := fullBinaryName(platform, name)
 	args = append(args, "-o", binary, fullBinaryDirectory(name))

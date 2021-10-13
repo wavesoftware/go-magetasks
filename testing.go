@@ -34,7 +34,7 @@ func appendVersion(args []string) []string {
 	if version != nil {
 		args = ldflags.NewBuilder().
 			Add(version.Path, version.Resolver).
-			Build(args)
+			BuildOnto(args)
 	}
 	return args
 }

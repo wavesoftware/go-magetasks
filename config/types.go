@@ -68,6 +68,13 @@ type Publisher interface {
 // Resolver is a func that resolves to a string.
 type Resolver func() string
 
+// StaticResolver can be used to create a Resolver from static data.
+func StaticResolver(value string) Resolver {
+	return func() string {
+		return value
+	}
+}
+
 // MageTag holds a mage tag.
 type MageTag struct {
 	Color color.Attribute
@@ -103,8 +110,8 @@ type Version struct {
 
 // Metadata holds additional contextual information.
 type Metadata struct {
-	Name string
-	Args map[string]Resolver
+	Name           string
+	BuildVariables map[string]Resolver
 }
 
 func (m Metadata) GetName() string {

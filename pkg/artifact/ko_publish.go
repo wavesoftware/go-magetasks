@@ -76,9 +76,9 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 	opts := &options.PublishOptions{
 		BaseImportPaths: true,
 		Push:            true,
-		Tags: []string{
-			config.Actual().Version.Resolver(),
-		},
+	}
+	if version := config.Actual().Version; version != nil {
+		opts.Tags = []string{version.Resolver()}
 	}
 	if v, ok := os.LookupEnv(magetasksImageBasenameSeparator); ok {
 		opts.ImageNameSeparator = v

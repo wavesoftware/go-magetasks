@@ -12,6 +12,7 @@ const imageReferenceKey = "oci.image.reference"
 // Image is an OCI image that will be built from a binary.
 type Image struct {
 	config.Metadata
+	Labels        map[string]config.Resolver
 	Architectures []platform.Architecture
 }
 

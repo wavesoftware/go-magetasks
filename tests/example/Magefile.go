@@ -22,13 +22,9 @@ var Default = magetasks.Build
 
 func init() { //nolint:gochecknoinits
 	dummy := artifact.Image{
-		Metadata: config.Metadata{
-			Name: "dummy",
-			Args: map[string]config.Resolver{
-				"DESC": func() string {
-					return "A dummy image"
-				},
-			},
+		Metadata: config.Metadata{Name: "dummy"},
+		Labels: map[string]config.Resolver{
+			"description": config.StaticResolver("A dummy image description"),
 		},
 		Architectures: []platform.Architecture{
 			platform.AMD64, platform.ARM64, platform.S390X, platform.PPC64LE,
@@ -37,7 +33,7 @@ func init() { //nolint:gochecknoinits
 	other := artifact.Binary{
 		Metadata: config.Metadata{
 			Name: "other",
-			Args: map[string]config.Resolver{
+			BuildVariables: map[string]config.Resolver{
 				metadata.ImagePath(): artifact.ImageReferenceOf(dummy),
 			},
 		},
