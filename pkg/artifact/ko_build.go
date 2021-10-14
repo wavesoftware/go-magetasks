@@ -69,12 +69,15 @@ func (kb KoBuilder) Build(artifact config.Artifact, notifier config.Notifier) co
 }
 
 func fillInLdflags(bo *options.BuildOptions, importPath string, image Image) {
-	version := config.Actual().Version
+	c := config.Actual()
 	args := make([]string, 0)
-	if version != nil || len(image.BuildVariables) > 0 {
+	if c.Version != nil || len(c.BuildVariables) > 0 || len(image.BuildVariables) > 0 {
 		builder := ldflags.NewBuilder()
-		if version != nil {
-			builder.Add(version.Path, version.Resolver)
+		for key, resolver := range c.BuildVariables {
+			builder.Add(key, resolver)
+		}
+		if c.Version != nil {
+			builder.Add(c.Version.Path, c.Version.Resolver)
 		}
 		for key, resolver := range image.BuildVariables {
 			builder.Add(key, resolver)

@@ -41,6 +41,10 @@ type Config struct {
 	// Checks holds a list of checks to perform.
 	Checks []Task
 
+	// BuildVariables holds extra list of variables to be passed to Golang's
+	// ldflags.
+	BuildVariables
+
 	// Overrides holds a list of overrides of this configuration.
 	Overrides []Configurator
 
@@ -110,8 +114,8 @@ type Version struct {
 
 // Metadata holds additional contextual information.
 type Metadata struct {
-	Name           string
-	BuildVariables map[string]Resolver
+	Name string
+	BuildVariables
 }
 
 func (m Metadata) GetName() string {

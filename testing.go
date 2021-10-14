@@ -24,17 +24,22 @@ func Test() {
 		"test", "-v", "-covermode=count",
 		fmt.Sprintf("-coverprofile=%s/coverage.out", files.BuildDir()),
 	}
-	args = append(appendVersion(args), "./...")
+	args = append(appendBuildVariables(args), "./...")
 	err := sh.RunV(cmd, args...)
 	t.End(err)
 }
 
-func appendVersion(args []string) []string {
-	version := config.Actual().Version
-	if version != nil {
-		args = ldflags.NewBuilder().
-			Add(version.Path, version.Resolver).
-			BuildOnto(args)
+func appendBuildVariables(args []string) []string {
+	c := config.Actual()
+	if c.Version != nil || len(c.BuildVariables) > 0 {
+		builder := ldflags.NewBuilder()
+		if c.Version != nil {
+			builder.Add(c.Version.Path, c.Version.Resolver)
+		}
+		for key, resolver := range c.BuildVariables {
+			builder.Add(key, resolver)
+		}
+		args = builder.BuildOnto(args)
 	}
 	return args
 }
