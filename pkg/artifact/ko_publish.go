@@ -14,9 +14,10 @@ import (
 )
 
 const (
-	koPublishResult        = "ko.publish.result"
-	koDockerRepo           = "KO_DOCKER_REPO"
-	magetasksImageBasename = "IMAGE_BASENAME"
+	koPublishResult                 = "ko.publish.result"
+	koDockerRepo                    = "KO_DOCKER_REPO"
+	magetasksImageBasename          = "IMAGE_BASENAME"
+	magetasksImageBasenameSeparator = "IMAGE_BASENAME_SEPARATOR"
 )
 
 // KoPublisherConfigurator is used to configure the publish options for KO.
@@ -78,6 +79,9 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 	}
 	if version := config.Actual().Version; version != nil {
 		opts.Tags = []string{version.Resolver()}
+	}
+	if v, ok := os.LookupEnv(magetasksImageBasenameSeparator); ok {
+		opts.ImageNameSeparator = v
 	}
 	if v, ok := os.LookupEnv(koDockerRepo); ok {
 		opts.DockerRepo = v
