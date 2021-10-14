@@ -1,9 +1,11 @@
-// +build ignore
+//go:build !ignore
+// +build !ignore
 
 package main
 
 import (
 	"os"
+
 	"github.com/magefile/mage/mage"
 )
 

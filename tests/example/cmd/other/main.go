@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/wavesoftware/go-magetasks/tests/example/internal"
+	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
 )
 
 func main() {
-	fmt.Printf("Dummy code! Version: %s\n", internal.Version)
+	log.Printf("Version: %s\n", metadata.Version)
+	log.Printf("Image: %s\n", metadata.Image)
 }

@@ -1,41 +1,62 @@
+//go:build mage
 // +build mage
 
 package main
 
 import (
-	"log"
-
-	"github.com/joho/godotenv"
-	"github.com/wavesoftware/go-magetasks/pkg/checks"
 
 	// mage:import
 	"github.com/wavesoftware/go-magetasks"
 	"github.com/wavesoftware/go-magetasks/config"
-
-	// mage:import
-	_ "github.com/wavesoftware/go-magetasks/container"
+	"github.com/wavesoftware/go-magetasks/pkg/artifact"
+	"github.com/wavesoftware/go-magetasks/pkg/artifact/platform"
+	"github.com/wavesoftware/go-magetasks/pkg/checks"
+	"github.com/wavesoftware/go-magetasks/pkg/git"
+	"github.com/wavesoftware/go-magetasks/tests/example/overrides"
+	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
 )
 
-// Default target is set to Binary
+// Default target is set to Build
 //goland:noinspection GoUnusedGlobalVariable
-var Default = magetasks.Binary // nolint:deadcode,unused
+var Default = magetasks.Build
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	addBinary(config.Binary{
-		Name: "dummy",
-		ImageArgs: map[string]string{
-			"DESC": "v0.6.9-Final",
+func init() { //nolint:gochecknoinits
+	dummy := artifact.Image{
+		Metadata: config.Metadata{Name: "dummy"},
+		Labels: map[string]config.Resolver{
+			"description": config.StaticResolver("A dummy image description"),
 		},
+		Architectures: []platform.Architecture{
+			platform.AMD64, platform.ARM64, platform.S390X, platform.PPC64LE,
+		},
+	}
+	other := artifact.Binary{
+		Metadata: config.Metadata{
+			Name: "other",
+			BuildVariables: map[string]config.Resolver{
+				metadata.ImagePath(): artifact.ImageReferenceOf(dummy),
+			},
+		},
+		Platforms: []artifact.Platform{
+			{OS: platform.Linux, Architecture: platform.AMD64},
+			{OS: platform.Linux, Architecture: platform.ARM64},
+			{OS: platform.Mac, Architecture: platform.AMD64},
+			{OS: platform.Mac, Architecture: platform.ARM64},
+			{OS: platform.Windows, Architecture: platform.AMD64},
+		},
+	}
+	magetasks.Configure(config.Config{
+		Version: &config.Version{
+			Path: metadata.VersionPath(), Resolver: git.Version,
+		},
+		Artifacts: []config.Artifact{
+			dummy, other,
+		},
+		Checks: []config.Task{
+			checks.GolangCiLint(),
+			checks.Revive(),
+			checks.Staticcheck(),
+		},
+		Overrides: overrides.List,
 	})
-	addBinary(config.Binary{Name: "other"})
-	config.VersionVariablePath = "github.com/wavesoftware/go-magetasks/tests/example/internal.Version"
-	checks.GolangCiLint()
-}
-
-func addBinary(bin config.Binary) {
-	config.Binaries = append(config.Binaries, bin)
 }
