@@ -17,8 +17,9 @@ require (
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/wavesoftware/go-ensure v1.0.0
 	golang.org/x/mod v0.5.1
-	golang.org/x/net v0.0.0-20211008194852-3b03d305991f // indirect
-	google.golang.org/genproto v0.0.0-20211008145708-270636b82663 // indirect
+	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e // indirect
+	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
+	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4 // indirect
 	gotest.tools/v3 v3.0.3
 	k8s.io/klog/v2 v2.20.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
