@@ -81,11 +81,14 @@ func (b Binary) buildForPlatform(
 	args := []string{
 		"build",
 	}
-	version := config.Actual().Version
-	if version != nil || len(b.BuildVariables) > 0 {
+	c := config.Actual()
+	if c.Version != nil || len(c.BuildVariables) > 0 || len(b.BuildVariables) > 0 {
 		builder := ldflags.NewBuilder()
-		if version != nil {
-			builder.Add(version.Path, version.Resolver)
+		for key, resolver := range c.BuildVariables {
+			builder.Add(key, resolver)
+		}
+		if c.Version != nil {
+			builder.Add(c.Version.Path, c.Version.Resolver)
 		}
 		for key, resolver := range b.BuildVariables {
 			builder.Add(key, resolver)

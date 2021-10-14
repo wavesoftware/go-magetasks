@@ -4,6 +4,8 @@
 package main
 
 import (
+	"os"
+	"strings"
 
 	// mage:import
 	"github.com/wavesoftware/go-magetasks"
@@ -33,9 +35,10 @@ func init() { //nolint:gochecknoinits
 	other := artifact.Binary{
 		Metadata: config.Metadata{
 			Name: "other",
-			BuildVariables: map[string]config.Resolver{
-				metadata.ImagePath(): artifact.ImageReferenceOf(dummy),
-			},
+			BuildVariables: config.NewBuildVariablesBuilder().
+				ConditionallyAdd(referenceImageByDigest,
+					metadata.ImagePath(), artifact.ImageReferenceOf(dummy)).
+				Build(),
 		},
 		Platforms: []artifact.Platform{
 			{OS: platform.Linux, Architecture: platform.AMD64},
@@ -57,6 +60,22 @@ func init() { //nolint:gochecknoinits
 			checks.Revive(),
 			checks.Staticcheck(),
 		},
+		BuildVariables: map[string]config.Resolver{
+			metadata.ImageBasenamePath(): func() string {
+				return os.Getenv("IMAGE_BASENAME")
+			},
+		},
 		Overrides: overrides.List,
 	})
+}
+
+func skipImageReference() bool {
+	if val, ok := os.LookupEnv("SKIP_IMAGE_REFERENCE"); ok {
+		return strings.ToLower(val) == "true"
+	}
+	return false
+}
+
+func referenceImageByDigest() bool {
+	return !skipImageReference()
 }
