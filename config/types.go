@@ -121,7 +121,7 @@ func (m Metadata) GetName() string {
 // Task is a custom function that will be used in the build.
 type Task struct {
 	Name      string
-	Operation func() error
+	Operation func(Notifier) error
 	Overrides []Configurator
 }
 

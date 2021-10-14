@@ -16,7 +16,8 @@ func Clean() {
 	errs = append(errs, err)
 	for _, task := range config.Actual().Cleaning {
 		p := t.Part(task.Name)
-		p.Starting().Done(task.Operation())
+		pp := p.Starting()
+		pp.Done(task.Operation(pp))
 	}
 	t.End(errs...)
 }

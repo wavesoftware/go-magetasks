@@ -1,12 +1,12 @@
 package checks
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/files"
-	"github.com/wavesoftware/go-magetasks/pkg/output"
 )
 
 const golangciLintName = "golangci-lint"
@@ -31,21 +31,22 @@ func GolangCiLint() config.Task {
 func GolangCiLintWithOptions(opts GolangCiLintOptions) config.Task {
 	return config.Task{
 		Name: golangciLintName,
-		Operation: func() error {
-			return golangCiLint(opts)
+		Operation: func(notifier config.Notifier) error {
+			return golangCiLint(opts, notifier)
 		},
 	}
 }
 
-func golangCiLint(opts GolangCiLintOptions) error {
+func golangCiLint(opts GolangCiLintOptions, notifier config.Notifier) error {
 	configFiles := []string{".golangci.yaml", ".golangci.yml"}
 	if configFilesMissing(configFiles) {
-		output.Printlnf("%s file(s) missing. Skipping.", configFiles)
+		skipBecauseOfMissingConfig(notifier, configFiles)
 		return nil
 	}
 	if !files.ExecutableAvailable(golangciLintName) {
-		output.Printlnf("%s executable isn't available on system PATH's."+
-			" Skipping.", golangciLintName)
+		skipBecauseOf(notifier,
+			fmt.Sprintf("%s executable isn't available on system PATH's."+
+				" Skipping.", golangciLintName))
 		return nil
 	}
 

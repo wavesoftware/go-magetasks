@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	log.Printf("Version: %s\nImage: %s\n",
-		metadata.Version, metadata.Image)
+	log.Printf("Version: %s\n", metadata.Version)
+	log.Printf("Image: %s\n", metadata.Image)
 }

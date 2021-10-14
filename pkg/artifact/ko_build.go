@@ -61,7 +61,7 @@ func (kb KoBuilder) Build(artifact config.Artifact, notifier config.Notifier) co
 	if err != nil {
 		return resultErrKoFailed(err)
 	}
-	notifier.Notify(fmt.Sprintf("built image: %s", color.Blue(ref)))
+	notifier.Notify(fmt.Sprintf("ko built image: %s", color.Blue(ref)))
 	return config.Result{Info: map[string]interface{}{
 		imageReferenceKey: ref.String(),
 		koBuildResult:     result,

@@ -13,8 +13,8 @@ func Check() {
 	t := tasks.Start("🔍", "Checking", len(config.Actual().Checks) > 0)
 	for _, check := range config.Actual().Checks {
 		p := t.Part(check.Name)
-		ps := p.Starting()
-		ps.Done(check.Operation())
+		pp := p.Starting()
+		pp.Done(check.Operation(pp))
 	}
 	t.End(nil)
 }
