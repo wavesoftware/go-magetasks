@@ -23,6 +23,3 @@ require (
 	k8s.io/klog/v2 v2.20.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-// FIXME: remove after https://github.com/google/ko/issues/476
-replace github.com/google/ko v0.9.3 => github.com/cardil/ko v0.9.4-0.20211013122324-2e666a856ec8
