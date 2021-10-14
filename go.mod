@@ -4,6 +4,9 @@ go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
+
+	// Fix for GHSA-c2h3-6mxw-7mvq
+	github.com/containerd/containerd v1.5.7 // indirect
 	github.com/docker/cli v20.10.9+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4 // indirect
 	github.com/fatih/color v1.13.0
