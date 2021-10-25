@@ -1,5 +1,16 @@
 package version
 
+import (
+	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/blang/semver"
+)
+
+// ErrVersionIsNotSemantic when given version is not semantic.
+var ErrVersionIsNotSemantic = errors.New("version is not semantic")
+
 // Resolver will resolve version string, and tell is that the latest artifact.
 type Resolver interface {
 	// Version returns the version string.
@@ -8,7 +19,19 @@ type Resolver interface {
 	IsLatest() bool
 }
 
-// CompatibleRanges will resolve compatibile ranges from a version resolver.
-func CompatibleRanges(r Resolver) []string {
-	return []string{}
+// CompatibleRanges will resolve compatible ranges from a version resolver.
+func CompatibleRanges(r Resolver) ([]string, error) {
+	v := r.Version()
+	prefix := ""
+	if strings.HasPrefix(v, "v") {
+		prefix = "v"
+	}
+	sv, err := semver.ParseTolerant(v)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrVersionIsNotSemantic, err)
+	}
+	return []string{
+		fmt.Sprintf("%s%d.%d", prefix, sv.Major, sv.Minor),
+		fmt.Sprintf("%s%d", prefix, sv.Major),
+	}, nil
 }

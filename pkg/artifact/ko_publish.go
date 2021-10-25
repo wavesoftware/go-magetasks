@@ -81,7 +81,11 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 	}
 	if ver := config.Actual().Version; ver != nil {
 		r := ver.Resolver
-		opts.Tags = append([]string{r.Version()}, version.CompatibleRanges(r)...)
+		ranges, err := version.CompatibleRanges(r)
+		if err != nil {
+			return nil, err
+		}
+		opts.Tags = append([]string{r.Version()}, ranges...)
 		if r.IsLatest() {
 			opts.Tags = append(opts.Tags, "latest")
 		}
