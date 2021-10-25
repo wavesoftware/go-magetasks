@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
+	github.com/blang/semver v3.5.1+incompatible
 	// Fix for GHSA-c2h3-6mxw-7mvq
 	github.com/containerd/containerd v1.5.7 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.9.0 // indirect

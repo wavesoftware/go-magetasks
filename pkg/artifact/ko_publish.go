@@ -11,6 +11,7 @@ import (
 	"github.com/google/ko/pkg/publish"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/output/color"
+	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
 const (
@@ -78,8 +79,12 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 		BaseImportPaths: true,
 		Push:            true,
 	}
-	if version := config.Actual().Version; version != nil {
-		opts.Tags = []string{version.Resolver()}
+	if ver := config.Actual().Version; ver != nil {
+		r := ver.Resolver
+		opts.Tags = append([]string{r.Version()}, version.CompatibleRanges(r)...)
+		if r.IsLatest() {
+			opts.Tags = append(opts.Tags, "latest")
+		}
 	}
 	if v, ok := os.LookupEnv(koDockerRepo); ok {
 		opts.DockerRepo = v

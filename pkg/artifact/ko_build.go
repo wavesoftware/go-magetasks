@@ -77,7 +77,7 @@ func fillInLdflags(bo *options.BuildOptions, importPath string, image Image) {
 			builder.Add(key, resolver)
 		}
 		if c.Version != nil {
-			builder.Add(c.Version.Path, c.Version.Resolver)
+			builder.Add(c.Version.Path, c.Version.Resolver.Version)
 		}
 		for key, resolver := range image.BuildVariables {
 			builder.Add(key, resolver)
@@ -97,7 +97,7 @@ func fillInLdflags(bo *options.BuildOptions, importPath string, image Image) {
 func buildLabels(image Image, importPath string) []string {
 	labels := make([]string, 0, len(image.Labels))
 	if version := config.Actual().Version; version != nil {
-		labels = append(labels, fmt.Sprintf("version=%s", version.Resolver()))
+		labels = append(labels, fmt.Sprintf("version=%s", version.Resolver.Version()))
 	}
 	labels = append(labels, fmt.Sprintf("%s=%s", koImportPath, importPath))
 	for key, resolver := range image.Labels {
