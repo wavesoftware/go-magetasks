@@ -30,8 +30,11 @@ func CompatibleRanges(r Resolver) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrVersionIsNotSemantic, err)
 	}
-	return []string{
-		fmt.Sprintf("%s%d.%d", prefix, sv.Major, sv.Minor),
-		fmt.Sprintf("%s%d", prefix, sv.Major),
-	}, nil
+	if len(sv.Pre) == 0 && len(sv.Build) == 0 {
+		return []string{
+			fmt.Sprintf("%s%d.%d", prefix, sv.Major, sv.Minor),
+			fmt.Sprintf("%s%d", prefix, sv.Major),
+		}, nil
+	}
+	return []string{}, nil
 }
