@@ -1,6 +1,7 @@
 package artifact
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -62,6 +63,7 @@ func (kp KoPublisher) Publish(artifact config.Artifact, notifier config.Notifier
 		return resultErrKoFailed(err)
 	}
 	notifier.Notify(fmt.Sprintf("pushed image: %s", color.Blue(ref)))
+	notifier.Notify(fmt.Sprintf("image tags: %s", color.Blue(fmt.Sprintf("%+q", po.Tags))))
 	return config.Result{Info: map[string]interface{}{
 		koPublishResult: ref,
 	}}
@@ -80,14 +82,8 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 		Push:            true,
 	}
 	if ver := config.Actual().Version; ver != nil {
-		r := ver.Resolver
-		ranges, err := version.CompatibleRanges(r)
-		if err != nil {
+		if err := resolveTags(opts, ver.Resolver); err != nil {
 			return nil, err
-		}
-		opts.Tags = append([]string{r.Version()}, ranges...)
-		if r.IsLatest() {
-			opts.Tags = append(opts.Tags, "latest")
 		}
 	}
 	if v, ok := os.LookupEnv(koDockerRepo); ok {
@@ -99,6 +95,21 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 		}
 	}
 	return opts, nil
+}
+
+func resolveTags(opts *options.PublishOptions, r version.Resolver) error {
+	ranges, err := version.CompatibleRanges(r)
+	if err != nil {
+		if !errors.Is(err, version.ErrVersionIsNotSemantic) {
+			return err
+		}
+		ranges = make([]string, 0)
+	}
+	opts.Tags = append([]string{r.Version()}, ranges...)
+	if r.IsLatest() {
+		opts.Tags = append(opts.Tags, "latest")
+	}
+	return nil
 }
 
 func closePublisher(publisher publish.Interface) {
