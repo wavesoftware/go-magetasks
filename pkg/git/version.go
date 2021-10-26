@@ -77,7 +77,9 @@ func (r Resolver) resolveTags() []string {
 func defaultIsLatestStrategy(r Resolver) bool {
 	v := r.Version()
 	sv, err := semver.ParseTolerant(v)
-	ensure.NoError(err)
+	if err != nil {
+		return false
+	}
 	for _, t := range r.resolveTags() {
 		tv, err := semver.ParseTolerant(t)
 		if err != nil {
