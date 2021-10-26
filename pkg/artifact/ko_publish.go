@@ -79,7 +79,7 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 		Push:            true,
 	}
 	if version := config.Actual().Version; version != nil {
-		opts.Tags = []string{version.Resolver()}
+		opts.Tags = []string{version.Resolver.Version()}
 	}
 	if v, ok := os.LookupEnv(koDockerRepo); ok {
 		opts.DockerRepo = v

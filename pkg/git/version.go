@@ -8,10 +8,13 @@ import (
 	"github.com/wavesoftware/go-magetasks/config"
 )
 
+// Resolver implements version.Resolver for git SCM.
+type Resolver struct{}
+
 var cacheKey = struct{}{}
 
 // Version returns a git version string.
-func Version() string {
+func (r Resolver) Version() string {
 	if version, ok := fromContext(); ok {
 		return version
 	}
@@ -20,6 +23,11 @@ func Version() string {
 	ensure.NoError(err)
 	saveInContext(version)
 	return version
+}
+
+func (r Resolver) IsLatest() bool {
+	// TODO: implements this properly.
+	return true
 }
 
 func saveInContext(version string) {
