@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 )
 
 // ErrVersionIsNotSemantic when given version is not semantic.

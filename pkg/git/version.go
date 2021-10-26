@@ -1,7 +1,7 @@
 package git
 
 import (
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/cache"
