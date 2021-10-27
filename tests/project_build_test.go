@@ -12,6 +12,9 @@ import (
 )
 
 func TestProjectBuild(t *testing.T) {
+	if testing.Short() {
+		t.Skip("short tests only")
+	}
 	execCmd(t, "./example", "./mage", "clean", "build")
 	execCmd(t, "./example/build/_output/bin", fmt.Sprintf("./other-%s-%s",
 		runtime.GOOS, runtime.GOARCH))

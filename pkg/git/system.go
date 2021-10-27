@@ -10,21 +10,20 @@ import (
 // ref.: https://regex101.com/r/ppnq02/1
 var remoteTagPattern = regexp.MustCompile(`^[0-9a-f]{7,}\s+refs/tags/([^^]+)(:?\^{})$`)
 
-type shellInfo struct {
+type installedGitBinaryRepo struct {
 	Remote
 }
 
-func (s shellInfo) Description() (string, error) {
+func (s installedGitBinaryRepo) Describe() (string, error) {
 	return sh.Output("git", "describe", "--always", "--tags", "--dirty")
 }
 
-func (s shellInfo) Tags() ([]string, error) {
+func (s installedGitBinaryRepo) Tags() ([]string, error) {
 	output, err := sh.Output("git", "ls-remote", "--tags", s.remote())
 	if err != nil {
 		return nil, err
 	}
-	tags := parseLsRemoteTagsOutput(output)
-	return tags, nil
+	return parseLsRemoteTagsOutput(output), nil
 }
 
 func parseLsRemoteTagsOutput(output string) []string {
@@ -45,7 +44,7 @@ func parseLsRemoteTagsOutput(output string) []string {
 	return tags
 }
 
-func (s shellInfo) remote() string {
+func (s installedGitBinaryRepo) remote() string {
 	if s.Remote.URL != "" {
 		return s.Remote.URL
 	}

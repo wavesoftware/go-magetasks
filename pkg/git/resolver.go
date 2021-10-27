@@ -1,14 +1,16 @@
 package git
 
 import (
-	"github.com/blang/semver/v4"
+	"errors"
+
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/cache"
+	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
 // IsLatestStrategy is used to determine if current version is latest one.
-type IsLatestStrategy func(Resolver) bool
+type IsLatestStrategy func(Resolver) func(versionRange string) (bool, error)
 
 // Remote represents a remote repository name and address.
 type Remote struct {
@@ -20,7 +22,7 @@ type Remote struct {
 type Resolver struct {
 	Cache cache.Cache
 	IsLatestStrategy
-	Info
+	Repository
 	*Remote
 }
 
@@ -30,18 +32,26 @@ type cacheKey struct {
 
 func (r Resolver) Version() string {
 	ver, err := r.cache().Compute(cacheKey{"version"}, func() (interface{}, error) {
-		return r.info().Description()
+		return r.repository().Describe()
 	})
 	ensure.NoError(err)
 	return ver.(string)
 }
 
-func (r Resolver) IsLatest() bool {
-	strategy := defaultIsLatestStrategy
+func (r Resolver) IsLatest(versionRange string) (bool, error) {
+	strategy := TagBasedIsLatestStrategy
 	if r.IsLatestStrategy != nil {
 		strategy = r.IsLatestStrategy
 	}
-	return strategy(r)
+	fn := strategy(r)
+	latest, err := fn(versionRange)
+	if err != nil {
+		if !errors.Is(err, version.ErrVersionIsNotValid) {
+			return false, err
+		}
+		return false, nil
+	}
+	return latest, nil
 }
 
 func (r Resolver) cache() cache.Cache {
@@ -51,11 +61,11 @@ func (r Resolver) cache() cache.Cache {
 	return r.Cache
 }
 
-func (r Resolver) info() Info {
-	if r.Info == nil {
-		return shellInfo{r.remote()}
+func (r Resolver) repository() Repository {
+	if r.Repository == nil {
+		return installedGitBinaryRepo{r.remote()}
 	}
-	return r.Info
+	return r.Repository
 }
 
 func (r Resolver) remote() Remote {
@@ -68,26 +78,8 @@ func (r Resolver) remote() Remote {
 
 func (r Resolver) resolveTags() []string {
 	tt, err := r.cache().Compute(cacheKey{"tags"}, func() (interface{}, error) {
-		return r.info().Tags()
+		return r.repository().Tags()
 	})
 	ensure.NoError(err)
 	return tt.([]string)
-}
-
-func defaultIsLatestStrategy(r Resolver) bool {
-	v := r.Version()
-	sv, err := semver.ParseTolerant(v)
-	if err != nil {
-		return false
-	}
-	for _, t := range r.resolveTags() {
-		tv, err := semver.ParseTolerant(t)
-		if err != nil {
-			continue
-		}
-		if tv.GT(sv) {
-			return false
-		}
-	}
-	return true
 }

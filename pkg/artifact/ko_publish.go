@@ -1,7 +1,6 @@
 package artifact
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"github.com/google/ko/pkg/commands/options"
 	"github.com/google/ko/pkg/publish"
 	"github.com/wavesoftware/go-magetasks/config"
+	pkgimage "github.com/wavesoftware/go-magetasks/pkg/image"
 	"github.com/wavesoftware/go-magetasks/pkg/output/color"
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
@@ -97,18 +97,12 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 	return opts, nil
 }
 
-func resolveTags(opts *options.PublishOptions, r version.Resolver) error {
-	ranges, err := version.CompatibleRanges(r)
+func resolveTags(opts *options.PublishOptions, resolver version.Resolver) error {
+	tags, err := pkgimage.Tags(resolver)
 	if err != nil {
-		if !errors.Is(err, version.ErrVersionIsNotSemantic) {
-			return err
-		}
-		ranges = make([]string, 0)
+		return err
 	}
-	opts.Tags = append([]string{r.Version()}, ranges...)
-	if r.IsLatest() {
-		opts.Tags = append(opts.Tags, "latest")
-	}
+	opts.Tags = tags
 	return nil
 }
 
