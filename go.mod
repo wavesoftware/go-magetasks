@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/blang/semver/v4 v4.0.0
-	// Fix for GHSA-c2h3-6mxw-7mvq
 	github.com/containerd/containerd v1.5.7 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.9.0 // indirect
 	github.com/docker/cli v20.10.10+incompatible // indirect
@@ -30,11 +29,7 @@ require (
 	google.golang.org/genproto v0.0.0-20211027162914-98a5263abeca // indirect
 	google.golang.org/grpc v1.41.0 // indirect
 	gotest.tools/v3 v3.0.3
+	k8s.io/apimachinery v0.22.3 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
-)
-
-exclude (
-	github.com/dgrijalva/jwt-go v0.0.0-20170104182250-a601269ab70c
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 )
