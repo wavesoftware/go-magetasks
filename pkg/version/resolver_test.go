@@ -9,12 +9,7 @@ import (
 )
 
 func TestCompatibleRanges(t *testing.T) {
-	tests := []struct {
-		version string
-		tags    []string
-		want    []string
-		err     error
-	}{{
+	tests := []compatibleRangesTestCase{{
 		version: "v0.5.2-2-g8cc3513",
 		want:    []string{},
 	}, {
@@ -32,10 +27,7 @@ func TestCompatibleRanges(t *testing.T) {
 		err:     version.ErrVersionIsNotValid,
 	}}
 	for _, tc := range tests {
-		tr := version.StaticResolver{
-			VersionString: tc.version,
-			Tags:          tc.tags,
-		}
+		tr := tc.resolver()
 		t.Run(tr.String(), func(t *testing.T) {
 			got, err := version.CompatibleRanges(tr)
 			errors.Check(t, err, tc.err)
@@ -48,4 +40,18 @@ func TestCompatibleRanges(t *testing.T) {
 
 func equal(a, b []string) bool {
 	return strings.NewSet(a...).Equal(strings.NewSet(b...))
+}
+
+type compatibleRangesTestCase struct {
+	version string
+	tags    []string
+	want    []string
+	err     error
+}
+
+func (tc compatibleRangesTestCase) resolver() version.StaticResolver {
+	return version.StaticResolver{
+		VersionString: tc.version,
+		Tags:          tc.tags,
+	}
 }
