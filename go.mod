@@ -33,8 +33,3 @@ require (
 	k8s.io/klog/v2 v2.30.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-exclude (
-	github.com/dgrijalva/jwt-go v0.0.0-20170104182250-a601269ab70c
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-)
