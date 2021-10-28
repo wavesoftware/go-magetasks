@@ -10,8 +10,8 @@ func (c OrderedResolver) Version() string {
 	return c.resolver().Version()
 }
 
-func (c OrderedResolver) IsLatest() bool {
-	return c.resolver().IsLatest()
+func (c OrderedResolver) IsLatest(versionRange string) (bool, error) {
+	return c.resolver().IsLatest(versionRange)
 }
 
 func (c OrderedResolver) resolver() Resolver {

@@ -25,13 +25,19 @@ func (v Values) Add(pair Pair) {
 	v[pair.Key] = pair.Value
 }
 
-// Current returns current environment values, from os.Environ method.
-func Current() Values {
+// New returns an environmental values bases on input compatible with the
+// os.Environ function.
+func New(environ []string) Values {
 	vals := Values(map[Key]Value{})
-	for _, pair := range os.Environ() {
+	for _, pair := range environ {
 		vals.Add(NewPair(pair))
 	}
 	return vals
+}
+
+// Current returns current environment values, from os.Environ method.
+func Current() Values {
+	return New(os.Environ())
 }
 
 // NewPair creates a pair from os.Environ style string.

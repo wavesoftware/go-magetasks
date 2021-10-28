@@ -11,6 +11,6 @@ func (c CompositeResolver) Version() string {
 	return c.VersionResolver.Version()
 }
 
-func (c CompositeResolver) IsLatest() bool {
-	return c.IsLatestResolver.IsLatest()
+func (c CompositeResolver) IsLatest(versionRange string) (bool, error) {
+	return c.IsLatestResolver.IsLatest(versionRange)
 }

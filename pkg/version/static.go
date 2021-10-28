@@ -1,15 +1,28 @@
 package version
 
-// StaticResolver is just static version information given up upfront.
+import "fmt"
+
+// StaticResolver just return values from values given upfront.
 type StaticResolver struct {
-	VersionString string
-	Latest        bool
+	VersionString         string
+	Tags                  []string
+	FailOnInvalidReleases bool
 }
 
-func (s StaticResolver) Version() string {
-	return s.VersionString
+func (r StaticResolver) String() string {
+	return fmt.Sprintf("%v,tags=%v,skipInvalidReleases=%v",
+		r.VersionString, r.Tags, r.FailOnInvalidReleases)
 }
 
-func (s StaticResolver) IsLatest() bool {
-	return s.Latest
+func (r StaticResolver) Version() string {
+	return r.VersionString
+}
+
+func (r StaticResolver) IsLatest(versionRange string) (bool, error) {
+	return IsLatestGivenReleases(
+		r.VersionString, versionRange, !r.FailOnInvalidReleases,
+		func() []string {
+			return r.Tags
+		},
+	)
 }

@@ -15,15 +15,16 @@ type want struct {
 
 func TestOrderedResolver(t *testing.T) {
 	tests := []struct {
-		resolver version.Resolver
+		resolver     version.Resolver
+		versionRange string
 		want
 	}{{
 		resolver: version.OrderedResolver{},
 		want:     want{version: "", isLatest: false},
 	}, {
 		resolver: version.OrderedResolver{Resolvers: []version.Resolver{
-			version.StaticResolver{VersionString: "", Latest: false},
-			version.StaticResolver{VersionString: "v3.4.5", Latest: true},
+			version.StaticResolver{},
+			version.StaticResolver{VersionString: "v3.4.5"},
 		}},
 		want: want{version: "v3.4.5", isLatest: true},
 	}}
@@ -32,7 +33,11 @@ func TestOrderedResolver(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			tc.resolver.Version()
 			assert.Equal(t, tc.resolver.Version(), tc.want.version)
-			assert.Equal(t, tc.resolver.IsLatest(), tc.want.isLatest)
+			if tc.want.version != "" {
+				latest, err := tc.resolver.IsLatest(tc.versionRange)
+				assert.NilError(t, err)
+				assert.Equal(t, latest, tc.want.isLatest)
+			}
 		})
 	}
 }

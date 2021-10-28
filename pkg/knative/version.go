@@ -1,6 +1,7 @@
 package knative
 
 import (
+	"github.com/wavesoftware/go-magetasks/pkg/environment"
 	"github.com/wavesoftware/go-magetasks/pkg/git"
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
@@ -9,40 +10,49 @@ import (
 // Knative project CI.
 type VersionResolver struct {
 	Git           *git.Resolver
-	Environmental *version.EnvironmentResolver
+	Environmental *environment.VersionResolver
 }
 
 func (v VersionResolver) Version() string {
 	return v.resolver().Version()
 }
 
-func (v VersionResolver) IsLatest() bool {
-	return v.resolver().IsLatest()
+func (v VersionResolver) IsLatest(versionRange string) (bool, error) {
+	return v.resolver().IsLatest(versionRange)
 }
 
 func (v VersionResolver) resolver() version.Resolver {
-	gr := git.Resolver{}
+	gitResolver := v.gitResolver()
+	return version.OrderedResolver{Resolvers: []version.Resolver{
+		version.CompositeResolver{
+			VersionResolver:  v.environmentalResolver(),
+			IsLatestResolver: gitResolver,
+		},
+		gitResolver,
+	}}
+}
+
+func (v VersionResolver) gitResolver() version.Resolver {
+	resolver := git.Resolver{}
 	if v.Git != nil {
-		gr = *v.Git
+		resolver = *v.Git
 	}
-	er := version.EnvironmentResolver{
+	return resolver
+}
+
+func (v VersionResolver) environmentalResolver() version.Resolver {
+	resolver := environment.VersionResolver{
 		VersionKey: "TAG",
-		IsApplicable: []version.Check{
+		IsApplicable: []environment.Check{
 			{Key: "TAG_RELEASE", Value: "1"},
 			{Key: "TAG"},
 		},
-		LatestOne: []version.Check{{
+		LatestOne: []environment.Check{{
 			Key: "is_auto_release", Value: "1",
 		}},
 	}
 	if v.Environmental != nil {
-		er = *v.Environmental
+		resolver = *v.Environmental
 	}
-	cr := version.CompositeResolver{
-		VersionResolver:  er,
-		IsLatestResolver: gr,
-	}
-	return version.OrderedResolver{
-		Resolvers: []version.Resolver{cr, gr},
-	}
+	return resolver
 }
