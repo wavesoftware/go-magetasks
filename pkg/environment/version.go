@@ -2,6 +2,8 @@ package environment
 
 import (
 	"log"
+
+	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
 // Check is used to verify environment values.
@@ -13,10 +15,11 @@ type VersionResolver struct {
 	VersionKey   Key
 	IsApplicable []Check
 	LatestOne    []Check
+	ValuesSupplier
 }
 
 func (e VersionResolver) Version() string {
-	values := Current()
+	values := e.environment()
 	if !e.isApplicable(values) {
 		return ""
 	}
@@ -24,8 +27,13 @@ func (e VersionResolver) Version() string {
 }
 
 func (e VersionResolver) IsLatest(versionRange string) (bool, error) {
-	log.Printf("Ignoring version range %#v", versionRange)
-	values := Current()
+	if versionRange == "" {
+		versionRange = version.AnyVersion
+	}
+	if versionRange != version.AnyVersion {
+		log.Printf("Ignoring version range %#v", versionRange)
+	}
+	values := e.environment()
 	if !e.isApplicable(values) {
 		return false, nil
 	}
@@ -35,6 +43,14 @@ func (e VersionResolver) IsLatest(versionRange string) (bool, error) {
 		}
 	}
 	return len(e.LatestOne) > 0, nil
+}
+
+func (e VersionResolver) environment() Values {
+	supplier := Current
+	if e.ValuesSupplier != nil {
+		supplier = e.ValuesSupplier
+	}
+	return supplier()
 }
 
 func (e VersionResolver) isApplicable(values Values) bool {

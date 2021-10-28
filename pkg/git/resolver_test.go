@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/wavesoftware/go-magetasks/pkg/cache"
 	"github.com/wavesoftware/go-magetasks/pkg/git"
+	"github.com/wavesoftware/go-magetasks/pkg/strings"
 	"github.com/wavesoftware/go-magetasks/pkg/testing/errors"
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 	"gotest.tools/v3/assert"
@@ -20,11 +22,11 @@ func TestResolver(t *testing.T) {
 		latest:       true,
 	}, {
 		version:      "v1.5.3",
-		tags:         []string{"v1.5.2", "v1.6.0"},
+		tags:         strings.NewSet("v1.5.2", "v1.6.0"),
 		versionRange: version.AnyVersion,
 	}, {
 		version:      "v1.5.3",
-		tags:         []string{"wrong", "v1.5.2", "v1.5.4", "v1.6.0"},
+		tags:         strings.NewSet("wrong", "v1.5.2", "v1.5.4", "v1.6.0"),
 		versionRange: version.AnyVersion,
 	}, {
 		version:      "1.5.3",
@@ -37,10 +39,10 @@ func TestResolver(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		resolver := git.Resolver{
-			Cache: noopCache{},
-			Repository: staticRepository{
-				describe: tc.version,
-				tags:     tc.tags,
+			Cache: cache.NoopCache{},
+			Repository: git.StaticRepository{
+				DescribeString: tc.version,
+				TagsSet:        tc.tags,
 			},
 		}
 		t.Run(tc.String(), func(t *testing.T) {
@@ -54,7 +56,7 @@ func TestResolver(t *testing.T) {
 
 type testCase struct {
 	version      string
-	tags         []string
+	tags         strings.Set
 	versionRange string
 	latest       bool
 	err          error
@@ -62,34 +64,11 @@ type testCase struct {
 
 func (tc testCase) String() string {
 	name := tc.version
-	if len(tc.tags) > 0 {
+	if tc.tags.Len() > 0 {
 		name = fmt.Sprintf("%s-%v", name, tc.tags)
 	}
 	if tc.versionRange != version.AnyVersion {
 		name = fmt.Sprintf("%s-%s", name, tc.versionRange)
 	}
 	return name
-}
-
-type noopCache struct{}
-
-func (n noopCache) Compute(_ interface{}, provider func() (interface{}, error)) (interface{}, error) {
-	return provider()
-}
-
-func (n noopCache) Drop(_ interface{}) interface{} {
-	return nil
-}
-
-type staticRepository struct {
-	describe string
-	tags     []string
-}
-
-func (s staticRepository) Describe() (string, error) {
-	return s.describe, nil
-}
-
-func (s staticRepository) Tags() ([]string, error) {
-	return s.tags, nil
 }

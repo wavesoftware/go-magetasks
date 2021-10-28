@@ -20,6 +20,9 @@ type Pair struct {
 // Values holds environment values together with their keys.
 type Values map[Key]Value
 
+// ValuesSupplier is a func that supplies environmental values.
+type ValuesSupplier func() Values
+
 // Add a pair to environment values.
 func (v Values) Add(pair Pair) {
 	v[pair.Key] = pair.Value
@@ -27,7 +30,7 @@ func (v Values) Add(pair Pair) {
 
 // New returns an environmental values bases on input compatible with the
 // os.Environ function.
-func New(environ []string) Values {
+func New(environ ...string) Values {
 	vals := Values(map[Key]Value{})
 	for _, pair := range environ {
 		vals.Add(NewPair(pair))
@@ -37,14 +40,15 @@ func New(environ []string) Values {
 
 // Current returns current environment values, from os.Environ method.
 func Current() Values {
-	return New(os.Environ())
+	return New(os.Environ()...)
 }
 
 // NewPair creates a pair from os.Environ style string.
 func NewPair(environ string) Pair {
-	parts := strings.SplitN(environ, "=", 1)
-	return Pair{
-		Key:   Key(parts[0]),
-		Value: Value(parts[1]),
+	parts := strings.SplitN(environ, "=", 2)
+	pair := Pair{Key: Key(parts[0])}
+	if len(parts) > 1 {
+		pair.Value = Value(parts[1])
 	}
+	return pair
 }

@@ -19,7 +19,7 @@ func (s installedGitBinaryRepo) Describe() (string, error) {
 }
 
 func (s installedGitBinaryRepo) Tags() ([]string, error) {
-	output, err := sh.Output("git", "ls-remote", "--tags", s.remote())
+	output, err := sh.Output("git", "ls-remote", "--TagsSet", s.remote())
 	if err != nil {
 		return nil, err
 	}
