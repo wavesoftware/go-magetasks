@@ -45,3 +45,17 @@ func (s Set) Contains(elem string) bool {
 	_, ok := s.set[elem]
 	return ok
 }
+
+// Slice coverts a Set to a []string.
+func (s Set) Slice() []string {
+	sl := make([]string, 0, len(s.set))
+	for elem := range s.set {
+		sl = append(sl, elem)
+	}
+	return sl
+}
+
+// Len gets the length of the Set.
+func (s Set) Len() int {
+	return len(s.set)
+}

@@ -1,6 +1,7 @@
 package version_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/wavesoftware/go-magetasks/pkg/strings"
@@ -9,13 +10,7 @@ import (
 )
 
 func TestCompatibleRanges(t *testing.T) {
-	tests := []struct {
-		version             string
-		tags                []string
-		skipInvalidReleases bool
-		want                []string
-		err                 error
-	}{{
+	tests := []compatibleRangesTestCase{{
 		version: "v0.5.2-2-g8cc3513",
 		want:    []string{},
 	}, {
@@ -32,13 +27,9 @@ func TestCompatibleRanges(t *testing.T) {
 		version: "af134dd",
 		err:     version.ErrVersionIsNotValid,
 	}}
-	for _, tc := range tests {
-		tr := version.StaticResolver{
-			VersionString:       tc.version,
-			Tags:                tc.tags,
-			SkipInvalidReleases: tc.skipInvalidReleases,
-		}
-		t.Run(tr.String(), func(t *testing.T) {
+	for i, tc := range tests {
+		tr := tc.resolver()
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got, err := version.CompatibleRanges(tr)
 			errors.Check(t, err, tc.err)
 			if !equal(got, tc.want) {
@@ -50,4 +41,18 @@ func TestCompatibleRanges(t *testing.T) {
 
 func equal(a, b []string) bool {
 	return strings.NewSet(a...).Equal(strings.NewSet(b...))
+}
+
+type compatibleRangesTestCase struct {
+	version string
+	tags    []string
+	want    []string
+	err     error
+}
+
+func (tc compatibleRangesTestCase) resolver() version.Resolver {
+	return staticResolver{
+		VersionString: tc.version,
+		Tags:          tc.tags,
+	}
 }

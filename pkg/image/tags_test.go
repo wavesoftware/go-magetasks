@@ -1,21 +1,20 @@
 package image_test
 
 import (
+	"strconv"
 	"testing"
 
+	"github.com/wavesoftware/go-magetasks/pkg/environment"
+	"github.com/wavesoftware/go-magetasks/pkg/git"
 	"github.com/wavesoftware/go-magetasks/pkg/image"
+	"github.com/wavesoftware/go-magetasks/pkg/knative"
 	"github.com/wavesoftware/go-magetasks/pkg/strings"
 	"github.com/wavesoftware/go-magetasks/pkg/testing/errors"
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
 func TestTags(t *testing.T) {
-	tests := []struct {
-		version string
-		tags    []string
-		want    []string
-		err     error
-	}{{
+	tests := []tagsTestCase{{
 		version: "v1.5.2-2-g8cc3513",
 		want:    []string{"v1.5.2-2-g8cc3513"},
 	}, {
@@ -23,11 +22,11 @@ func TestTags(t *testing.T) {
 		want:    []string{"v1.5.3", "v1.5", "v1", "latest"},
 	}, {
 		version: "v1.5.3",
-		tags:    []string{"v1.5.2", "v1.6.0"},
+		tags:    strings.NewSet("v1.5.2", "v1.6.0"),
 		want:    []string{"v1.5", "v1.5.3"},
 	}, {
 		version: "v1.5.3",
-		tags:    []string{"wrong", "v1.5.2", "v1.5.4", "v1.6.0"},
+		tags:    strings.NewSet("wrong", "v1.5.2", "v1.5.4", "v1.6.0"),
 		want:    []string{"v1.5.3"},
 	}, {
 		version: "1.5.3",
@@ -36,13 +35,9 @@ func TestTags(t *testing.T) {
 		version: "af134dd",
 		want:    []string{"af134dd"},
 	}}
-	for _, tc := range tests {
-		resolver := version.StaticResolver{
-			VersionString:       tc.version,
-			Tags:                tc.tags,
-			SkipInvalidReleases: true,
-		}
-		t.Run(resolver.String(), func(t *testing.T) {
+	for i, tc := range tests {
+		resolver := tc.resolver()
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got, err := image.Tags(resolver)
 			errors.Check(t, err, tc.err)
 			if !equal(got, tc.want) {
@@ -50,6 +45,22 @@ func TestTags(t *testing.T) {
 			}
 		})
 	}
+}
+
+type tagsTestCase struct {
+	version string
+	tags    strings.Set
+	want    []string
+	err     error
+}
+
+func (tc tagsTestCase) resolver() version.Resolver {
+	return knative.NewTestableVersionResolver(
+		git.StaticRepository{DescribeString: tc.version, TagsSet: tc.tags},
+		func() environment.Values {
+			return nil
+		},
+	)
 }
 
 func equal(a, b []string) bool {

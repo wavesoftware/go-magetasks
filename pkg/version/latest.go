@@ -6,6 +6,9 @@ import (
 	"github.com/blang/semver/v4"
 )
 
+// AnyVersion is a range that matches any released version.
+const AnyVersion = ">=0.0.0"
+
 // IsLatestResolver is a func that returns true if given version is the latest
 // one within given version range.
 type IsLatestResolver func(version semver.Version, versionRange semver.Range) (bool, error)
@@ -17,6 +20,9 @@ func IsLatest(version, versionRange string, resolver IsLatestResolver) (bool, er
 	sver, err := semver.ParseTolerant(version)
 	if err != nil {
 		return false, fmt.Errorf("%w: %v", ErrVersionIsNotValid, err)
+	}
+	if versionRange == "" {
+		versionRange = AnyVersion
 	}
 	verRange, err := semver.ParseRange(versionRange)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/artifact"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact/platform"
 	"github.com/wavesoftware/go-magetasks/pkg/checks"
-	"github.com/wavesoftware/go-magetasks/pkg/git"
+	"github.com/wavesoftware/go-magetasks/pkg/knative"
 	"github.com/wavesoftware/go-magetasks/tests/example/overrides"
 	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
 )
@@ -50,7 +50,7 @@ func init() { //nolint:gochecknoinits
 	}
 	magetasks.Configure(config.Config{
 		Version: &config.Version{
-			Path: metadata.VersionPath(), Resolver: git.Resolver{},
+			Path: metadata.VersionPath(), Resolver: knative.NewVersionResolver(),
 		},
 		Artifacts: []config.Artifact{
 			dummy, other,

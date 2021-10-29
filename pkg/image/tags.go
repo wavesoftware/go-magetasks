@@ -18,7 +18,7 @@ func Tags(resolver version.Resolver) ([]string, error) {
 	}
 	tags := append([]string{resolver.Version()}, ranges...)
 	var latest bool
-	latest, err = resolver.IsLatest(">= 0.0.0")
+	latest, err = resolver.IsLatest(version.AnyVersion)
 	if err != nil && !errors.Is(err, version.ErrVersionIsNotValid) {
 		return nil, err
 	}
