@@ -38,7 +38,7 @@ func TestResolver(t *testing.T) {
 	}}
 	for _, tc := range tests {
 		tc := tc
-		resolver := git.Resolver{
+		resolver := git.VersionResolver{
 			Cache: cache.NoopCache{},
 			Repository: git.StaticRepository{
 				DescribeString: tc.version,

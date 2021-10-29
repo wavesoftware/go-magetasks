@@ -6,53 +6,58 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
-// VersionResolver is version resolver implementation directly targeting
-// Knative project CI.
-type VersionResolver struct {
-	Git           *git.Resolver
-	Environmental *environment.VersionResolver
-}
-
-func (v VersionResolver) Version() string {
-	return v.resolver().Version()
-}
-
-func (v VersionResolver) IsLatest(versionRange string) (bool, error) {
-	return v.resolver().IsLatest(versionRange)
-}
-
-func (v VersionResolver) resolver() version.Resolver {
-	gitResolver := v.gitResolver()
-	return version.OrderedResolver{Resolvers: []version.Resolver{
-		version.CompositeResolver{
-			VersionResolver:  v.environmentalResolver(),
-			IsLatestResolver: gitResolver,
+// NewVersionResolver creates a version.Resolver implementation directly
+// targeting Knative project CI.
+func NewVersionResolver(options ...VersionResolverOption) version.Resolver {
+	r := versionResolver{
+		env: environment.VersionResolver{
+			VersionKey: "TAG",
+			IsApplicable: []environment.Check{
+				{Key: "TAG_RELEASE", Value: "1"},
+				{Key: "TAG"},
+			},
 		},
-		gitResolver,
-	}}
+	}
+	for _, option := range options {
+		option(&r)
+	}
+
+	return r
 }
 
-func (v VersionResolver) gitResolver() version.Resolver {
-	resolver := git.Resolver{}
-	if v.Git != nil {
-		resolver = *v.Git
+// VersionResolverOption id option to customize version resolution.
+type VersionResolverOption func(*versionResolver)
+
+// WithGit allows passing options for git.VersionResolver.
+func WithGit(options ...git.VersionResolverOption) VersionResolverOption {
+	return func(resolver *versionResolver) {
+		for _, option := range options {
+			option(&resolver.git)
+		}
 	}
-	return resolver
 }
 
-func (v VersionResolver) environmentalResolver() version.Resolver {
-	resolver := environment.VersionResolver{
-		VersionKey: "TAG",
-		IsApplicable: []environment.Check{
-			{Key: "TAG_RELEASE", Value: "1"},
-			{Key: "TAG"},
-		},
-		LatestOne: []environment.Check{{
-			Key: "is_auto_release", Value: "1",
-		}},
+// WithEnvironmental allows passing options for environment.VersionResolver.
+func WithEnvironmental(options ...environment.VersionResolverOption) VersionResolverOption {
+	return func(resolver *versionResolver) {
+		for _, option := range options {
+			option(&resolver.env)
+		}
 	}
-	if v.Environmental != nil {
-		resolver = *v.Environmental
+}
+
+type versionResolver struct {
+	git git.VersionResolver
+	env environment.VersionResolver
+}
+
+func (v versionResolver) Version() string {
+	if ver := v.env.Version(); ver != "" {
+		return ver
 	}
-	return resolver
+	return v.git.Version()
+}
+
+func (v versionResolver) IsLatest(versionRange string) (bool, error) {
+	return git.ResolveIsLatest(v.git, v, versionRange)
 }

@@ -1,22 +1,44 @@
 package environment
 
 import (
-	"log"
-
-	"github.com/wavesoftware/go-magetasks/pkg/version"
+	"errors"
+	"fmt"
 )
 
-// Check is used to verify environment values.
-type Check Pair
+// ErrNotSupported when operation is not supported.
+var ErrNotSupported = errors.New("not supported")
+
+// NewVersionResolver creates a VersionResolver using options.
+func NewVersionResolver(options ...VersionResolverOption) VersionResolver {
+	r := VersionResolver{}
+
+	for _, option := range options {
+		option(&r)
+	}
+
+	return r
+}
+
+// WithValuesSupplier allows to set the values supplier.
+func WithValuesSupplier(vs ValuesSupplier) VersionResolverOption {
+	return func(r *VersionResolver) {
+		r.ValuesSupplier = vs
+	}
+}
+
+// VersionResolverOption is used to customize creation of VersionResolver.
+type VersionResolverOption func(*VersionResolver)
 
 // VersionResolver is used to resolve version information solely on
 // environment variables.
 type VersionResolver struct {
 	VersionKey   Key
 	IsApplicable []Check
-	LatestOne    []Check
 	ValuesSupplier
 }
+
+// Check is used to verify environment values.
+type Check Pair
 
 func (e VersionResolver) Version() string {
 	values := e.environment()
@@ -27,22 +49,9 @@ func (e VersionResolver) Version() string {
 }
 
 func (e VersionResolver) IsLatest(versionRange string) (bool, error) {
-	if versionRange == "" {
-		versionRange = version.AnyVersion
-	}
-	if versionRange != version.AnyVersion {
-		log.Printf("Ignoring version range %#v", versionRange)
-	}
-	values := e.environment()
-	if !e.isApplicable(values) {
-		return false, nil
-	}
-	for _, check := range e.LatestOne {
-		if !check.test(values) {
-			return false, nil
-		}
-	}
-	return len(e.LatestOne) > 0, nil
+	return false, fmt.Errorf(
+		"%w: IsLatest(versionRange string) by environment.VersionResolver",
+		ErrNotSupported)
 }
 
 func (e VersionResolver) environment() Values {

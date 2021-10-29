@@ -1,6 +1,7 @@
 package version_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/wavesoftware/go-magetasks/pkg/strings"
@@ -26,9 +27,9 @@ func TestCompatibleRanges(t *testing.T) {
 		version: "af134dd",
 		err:     version.ErrVersionIsNotValid,
 	}}
-	for _, tc := range tests {
+	for i, tc := range tests {
 		tr := tc.resolver()
-		t.Run(tr.String(), func(t *testing.T) {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got, err := version.CompatibleRanges(tr)
 			errors.Check(t, err, tc.err)
 			if !equal(got, tc.want) {
@@ -49,8 +50,8 @@ type compatibleRangesTestCase struct {
 	err     error
 }
 
-func (tc compatibleRangesTestCase) resolver() version.StaticResolver {
-	return version.StaticResolver{
+func (tc compatibleRangesTestCase) resolver() version.Resolver {
+	return staticResolver{
 		VersionString: tc.version,
 		Tags:          tc.tags,
 	}

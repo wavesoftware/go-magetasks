@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/wavesoftware/go-magetasks/pkg/cache"
 	"github.com/wavesoftware/go-magetasks/pkg/environment"
 	"github.com/wavesoftware/go-magetasks/pkg/git"
 	"github.com/wavesoftware/go-magetasks/pkg/knative"
@@ -15,20 +14,19 @@ import (
 )
 
 func TestVersionResolver(t *testing.T) {
-	tests := []testCase{{
-		environment: environment.New(),
-	}, {
-		environment:  environment.New(),
-		versionRange: "< 9999.9.9",
-	}, {
+	tests := []testCase{{}, {
 		environment: environment.New("TAG=v4.6.23", "TAG_RELEASE=1"),
 		version:     "v4.6.23",
+		latest:      true,
 	}, {
-		// FIXME: This is not working because the CompositeResolver is buggy, and
-		//        GitResolver resolves "" as version instead of using value resolved
-		//        from environment.
-		environment: environment.New("TAG=v6.23.0", "TAG_RELEASE=1"),
-		version:     "v6.23.0",
+		environment: environment.New("TAG=v6.23.1", "TAG_RELEASE=1"),
+		version:     "v6.23.1",
+		tags:        strings.NewSet("v6.23.0", "v7.0.0"),
+		latest:      false,
+	}, {
+		environment: environment.New("TAG=v23.1.2", "TAG_RELEASE=1"),
+		version:     "v23.1.2",
+		tags:        strings.NewSet("v6.23.0", "v7.0.0"),
 		latest:      true,
 	}}
 	for i, tc := range tests {
@@ -37,7 +35,7 @@ func TestVersionResolver(t *testing.T) {
 			resolver := tc.resolver()
 			assert.Equal(t, resolver.Version(), tc.version)
 			if tc.version != "" {
-				latest, err := resolver.IsLatest(tc.versionRange)
+				latest, err := resolver.IsLatest(version.AnyVersion)
 				errors.Check(t, err, tc.err)
 				assert.Equal(t, latest, tc.latest)
 			}
@@ -46,37 +44,19 @@ func TestVersionResolver(t *testing.T) {
 }
 
 type testCase struct {
-	environment  environment.Values
-	describe     string
-	tags         strings.Set
-	versionRange string
-	version      string
-	latest       bool
-	err          error
+	environment environment.Values
+	describe    string
+	tags        strings.Set
+	version     string
+	latest      bool
+	err         error
 }
 
 func (tc testCase) resolver() version.Resolver {
-	resolver := knative.VersionResolver{
-		Git: &git.Resolver{
-			Cache: cache.NoopCache{},
-			Repository: git.StaticRepository{
-				DescribeString: tc.describe,
-				TagsSet:        tc.tags,
-			},
+	return knative.NewTestableVersionResolver(
+		git.StaticRepository{DescribeString: tc.describe, TagsSet: tc.tags},
+		func() environment.Values {
+			return tc.environment
 		},
-		Environmental: &environment.VersionResolver{
-			VersionKey: "TAG",
-			IsApplicable: []environment.Check{{
-				Key: "TAG_RELEASE", Value: "1",
-			}},
-			LatestOne: []environment.Check{{
-				Key: "is_auto_release", Value: "1",
-			}},
-			ValuesSupplier: func() environment.Values {
-				return tc.environment
-			},
-		},
-	}
-
-	return resolver
+	)
 }

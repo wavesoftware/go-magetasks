@@ -50,7 +50,7 @@ func init() { //nolint:gochecknoinits
 	}
 	magetasks.Configure(config.Config{
 		Version: &config.Version{
-			Path: metadata.VersionPath(), Resolver: knative.VersionResolver{},
+			Path: metadata.VersionPath(), Resolver: knative.NewVersionResolver(),
 		},
 		Artifacts: []config.Artifact{
 			dummy, other,
