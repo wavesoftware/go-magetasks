@@ -32,8 +32,8 @@ func TestVersionResolver(t *testing.T) {
 }
 
 type testCase struct {
-	environment  environment.Values
-	version      string
+	environment environment.Values
+	version     string
 }
 
 func (tc testCase) resolver() version.Resolver {

@@ -45,10 +45,12 @@ func Current() Values {
 
 // NewPair creates a pair from os.Environ style string.
 func NewPair(environ string) Pair {
-	parts := strings.SplitN(environ, "=", 2)
+	parts := strings.SplitN(environ, "=", pairElements)
 	pair := Pair{Key: Key(parts[0])}
 	if len(parts) > 1 {
 		pair.Value = Value(parts[1])
 	}
 	return pair
 }
+
+const pairElements = 2
