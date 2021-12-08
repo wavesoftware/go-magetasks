@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	// mage:import
-	"github.com/wavesoftware/go-magetasks"
+	"github.com/wavesoftware/go-magetasks" //nolint:typecheck
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact/platform"
@@ -20,7 +20,7 @@ import (
 
 // Default target is set to Build
 //goland:noinspection GoUnusedGlobalVariable
-var Default = magetasks.Build
+var Default = magetasks.Build //nolint:typecheck
 
 func init() { //nolint:gochecknoinits
 	dummy := artifact.Image{
@@ -48,7 +48,7 @@ func init() { //nolint:gochecknoinits
 			{OS: platform.Windows, Architecture: platform.AMD64},
 		},
 	}
-	magetasks.Configure(config.Config{
+	magetasks.Configure(config.Config{ //nolint:typecheck
 		Version: &config.Version{
 			Path: metadata.VersionPath(), Resolver: knative.NewVersionResolver(),
 		},
