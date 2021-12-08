@@ -6,7 +6,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/fatih/color v1.13.0
 	github.com/google/go-containerregistry v0.7.0
-	github.com/google/ko v0.9.4-0.20211122203229-af2ff52a11c4
+	github.com/google/ko v0.9.4-0.20211208134726-54cddccd1cef
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/joho/godotenv v1.4.0
 	github.com/magefile/mage v1.11.0
@@ -21,6 +21,5 @@ require (
 	github.com/containerd/containerd v1.5.8 //indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
-	github.com/opencontainers/image-spec v1.0.2 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 )
