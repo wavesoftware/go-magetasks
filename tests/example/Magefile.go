@@ -4,6 +4,8 @@
 package main
 
 import (
+	"os"
+	"strings"
 
 	// mage:import
 	"github.com/wavesoftware/go-magetasks"
@@ -11,7 +13,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/artifact"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact/platform"
 	"github.com/wavesoftware/go-magetasks/pkg/checks"
-	"github.com/wavesoftware/go-magetasks/pkg/git"
+	"github.com/wavesoftware/go-magetasks/pkg/knative"
 	"github.com/wavesoftware/go-magetasks/tests/example/overrides"
 	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
 )
@@ -33,9 +35,10 @@ func init() { //nolint:gochecknoinits
 	other := artifact.Binary{
 		Metadata: config.Metadata{
 			Name: "other",
-			BuildVariables: map[string]config.Resolver{
-				metadata.ImagePath(): artifact.ImageReferenceOf(dummy),
-			},
+			BuildVariables: config.NewBuildVariablesBuilder().
+				ConditionallyAdd(referenceImageByDigest,
+					metadata.ImagePath(), artifact.ImageReferenceOf(dummy)).
+				Build(),
 		},
 		Platforms: []artifact.Platform{
 			{OS: platform.Linux, Architecture: platform.AMD64},
@@ -47,7 +50,7 @@ func init() { //nolint:gochecknoinits
 	}
 	magetasks.Configure(config.Config{
 		Version: &config.Version{
-			Path: metadata.VersionPath(), Resolver: git.Version,
+			Path: metadata.VersionPath(), Resolver: knative.NewVersionResolver(),
 		},
 		Artifacts: []config.Artifact{
 			dummy, other,
@@ -57,6 +60,22 @@ func init() { //nolint:gochecknoinits
 			checks.Revive(),
 			checks.Staticcheck(),
 		},
+		BuildVariables: map[string]config.Resolver{
+			metadata.ImageBasenamePath(): func() string {
+				return os.Getenv("IMAGE_BASENAME")
+			},
+		},
 		Overrides: overrides.List,
 	})
+}
+
+func skipImageReference() bool {
+	if val, ok := os.LookupEnv("SKIP_IMAGE_REFERENCE"); ok {
+		return strings.ToLower(val) == "true"
+	}
+	return false
+}
+
+func referenceImageByDigest() bool {
+	return !skipImageReference()
 }

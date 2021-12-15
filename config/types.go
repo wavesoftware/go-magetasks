@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/fatih/color"
+	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
 // Config holds configuration information.
@@ -40,6 +41,10 @@ type Config struct {
 
 	// Checks holds a list of checks to perform.
 	Checks []Task
+
+	// BuildVariables holds extra list of variables to be passed to Golang's
+	// ldflags.
+	BuildVariables
 
 	// Overrides holds a list of overrides of this configuration.
 	Overrides []Configurator
@@ -105,13 +110,13 @@ type ResultKey string
 // compile time.
 type Version struct {
 	Path string
-	Resolver
+	version.Resolver
 }
 
 // Metadata holds additional contextual information.
 type Metadata struct {
-	Name           string
-	BuildVariables map[string]Resolver
+	Name string
+	BuildVariables
 }
 
 func (m Metadata) GetName() string {

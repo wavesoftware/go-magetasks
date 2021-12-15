@@ -8,5 +8,5 @@ import (
 
 func main() {
 	log.Printf("Version: %s\n", metadata.Version)
-	log.Printf("Image: %s\n", metadata.Image)
+	log.Printf("Image: %s\n", metadata.ResolveImage())
 }
