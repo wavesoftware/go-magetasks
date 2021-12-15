@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/google/ko/pkg/build"
 	"github.com/google/ko/pkg/commands"
@@ -16,9 +18,10 @@ import (
 )
 
 const (
-	koPublishResult        = "ko.publish.result"
-	koDockerRepo           = "KO_DOCKER_REPO"
-	magetasksImageBasename = "IMAGE_BASENAME"
+	koPublishResult                 = "ko.publish.result"
+	koDockerRepo                    = "KO_DOCKER_REPO"
+	magetasksImageBasename          = "IMAGE_BASENAME"
+	magetasksImageBasenameSeparator = "IMAGE_BASENAME_SEPARATOR"
 )
 
 // KoPublisherConfigurator is used to configure the publish options for KO.
@@ -86,6 +89,9 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 			return nil, err
 		}
 	}
+	if v, ok := os.LookupEnv(magetasksImageBasenameSeparator); ok {
+		opts.ImageNamer = customSeparatorImageNamer{v}.name
+	}
 	if v, ok := os.LookupEnv(koDockerRepo); ok {
 		opts.DockerRepo = v
 	}
@@ -110,4 +116,21 @@ func closePublisher(publisher publish.Interface) {
 	if err := publisher.Close(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+type customSeparatorImageNamer struct {
+	sep string
+}
+
+func (n customSeparatorImageNamer) name(base, importpath string) string {
+	return n.join(base, path.Base(importpath))
+}
+
+func (n customSeparatorImageNamer) join(paths ...string) string {
+	for i, e := range paths {
+		if e != "" {
+			return path.Clean(strings.Join(paths[i:], n.sep))
+		}
+	}
+	return ""
 }
