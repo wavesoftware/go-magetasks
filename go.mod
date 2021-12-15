@@ -20,5 +20,4 @@ require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/containerd/containerd v1.5.8 //indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
-	k8s.io/klog/v2 v2.30.0 // indirect
 )
