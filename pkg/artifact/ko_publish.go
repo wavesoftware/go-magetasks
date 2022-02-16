@@ -3,6 +3,8 @@ package artifact
 import (
 	"fmt"
 	"log"
+	"path"
+	"strings"
 
 	"github.com/google/ko/pkg/build"
 	"github.com/google/ko/pkg/commands"
@@ -14,7 +16,10 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
-const koPublishResult = "ko.publish.result"
+const (
+	koPublishResult                 = "ko.publish.result"
+	magetasksImageBasenameSeparator = "IMAGE_BASENAME_SEPARATOR"
+)
 
 // KoPublisherConfigurator is used to configure the publish options for KO.
 type KoPublisherConfigurator func(*options.PublishOptions) error
@@ -66,9 +71,11 @@ func (kp KoPublisher) Publish(artifact config.Artifact, notifier config.Notifier
 
 func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 	opts := &options.PublishOptions{
-		DockerRepo:      artifactimage.BaseName(),
-		BaseImportPaths: true,
-		Push:            true,
+		DockerRepo: artifactimage.BaseName(),
+		Push:       true,
+		ImageNamer: customSeparatorImageNamer{
+			artifactimage.BaseNameSeparator(),
+		}.name,
 	}
 	if ver := config.Actual().Version; ver != nil {
 		if err := resolveTags(opts, ver.Resolver); err != nil {
@@ -96,4 +103,21 @@ func closePublisher(publisher publish.Interface) {
 	if err := publisher.Close(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+type customSeparatorImageNamer struct {
+	sep string
+}
+
+func (n customSeparatorImageNamer) name(base, importpath string) string {
+	return n.join(base, path.Base(importpath))
+}
+
+func (n customSeparatorImageNamer) join(paths ...string) string {
+	for i, e := range paths {
+		if e != "" {
+			return path.Clean(strings.Join(paths[i:], n.sep))
+		}
+	}
+	return ""
 }
