@@ -9,10 +9,10 @@ require (
 	github.com/google/ko v0.9.4-0.20220216203347-3fc720f912ac
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/joho/godotenv v1.4.0
-	github.com/magefile/mage v1.11.0
+	github.com/magefile/mage v1.12.1
 	github.com/wavesoftware/go-ensure v1.0.0
 	golang.org/x/mod v0.5.1
-	gotest.tools/v3 v3.0.3
+	gotest.tools/v3 v3.1.0
 )
 
 require (
