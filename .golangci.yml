@@ -36,3 +36,10 @@ issues:
     - path: _test\.go
       linters:
         - wrapcheck
+
+linters-settings:
+  gci:
+    # TODO: remove after golangci/golangci-lint#2588 is fixed
+    sections:
+      - standard
+      - default
