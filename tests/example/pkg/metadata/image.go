@@ -1,31 +1,73 @@
 package metadata
 
-import "fmt"
+import (
+	pkgimage "github.com/wavesoftware/go-magetasks/pkg/image"
+)
 
 var (
-	// Image holds information about companion image reference.
-	Image = "" //nolint:gochecknoglobals
+	// DummyImageRef holds information about companion dummy image.
+	DummyImageRef = "" //nolint:gochecknoglobals
+	// SampleImageRef holds information about companion sample image.
+	SampleImageRef = "" //nolint:gochecknoglobals
 	// ImageBasename holds a basename of a image, so the development reference
 	// could be built from it.
 	ImageBasename = "" //nolint:gochecknoglobals
+	// ImageBasenameSeparator holds a separator between image basename and name.
+	ImageBasenameSeparator = "/" //nolint:gochecknoglobals
+)
+
+// Image represents an image.
+type Image string
+
+const (
+	// DummyImage represents a dummy image.
+	DummyImage Image = "dummy"
+	// SampleImage represents a sample image.
+	SampleImage Image = "sampleimage"
 )
 
 // ResolveImage will try to resolve the image reference from set values. If
-// Image is given it will be used, otherwise the ImageBasename and Version will
+// DummyImageRef is given it will be used, otherwise the ImageBasename and Version will
 // be used.
-func ResolveImage() string {
-	if Image == "" {
-		return fmt.Sprintf("%s:%s", ImageBasename, Version)
+func ResolveImage(image Image) string {
+	ref := func() string {
+		switch image {
+		case DummyImage:
+			return DummyImageRef
+		case SampleImage:
+			return SampleImageRef
+		}
+		return ""
+	}()
+	if ref == "" {
+		return pkgimage.FloatToRelease(
+			ImageBasename, string(image), ImageBasenameSeparator, Version,
+			pkgimage.FloatDirectionDown)
 	}
-	return Image
+	return ref
 }
 
 // ImagePath return a path to the image variable.
-func ImagePath() string {
-	return importPath("Image")
+func ImagePath(image Image) string {
+	variable := func() string {
+		switch image {
+		case DummyImage:
+			return "DummyImageRef"
+		case SampleImage:
+			return "SampleImageRef"
+		}
+		panic("unsupported image: " + image)
+	}()
+	return importPath(variable)
 }
 
 // ImageBasenamePath return a path to the image basename variable.
 func ImageBasenamePath() string {
 	return importPath("ImageBasename")
+}
+
+// ImageBasenameSeparatorPath return a path to the image basename separator
+// variable.
+func ImageBasenameSeparatorPath() string {
+	return importPath("ImageBasenameSeparator")
 }

@@ -3,7 +3,6 @@ package artifact
 import (
 	"fmt"
 	"log"
-	"os"
 	"path"
 	"strings"
 
@@ -12,17 +11,12 @@ import (
 	"github.com/google/ko/pkg/commands/options"
 	"github.com/google/ko/pkg/publish"
 	"github.com/wavesoftware/go-magetasks/config"
-	pkgimage "github.com/wavesoftware/go-magetasks/pkg/image"
+	artifactimage "github.com/wavesoftware/go-magetasks/pkg/artifact/image"
 	"github.com/wavesoftware/go-magetasks/pkg/output/color"
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
-const (
-	koPublishResult                 = "ko.publish.result"
-	koDockerRepo                    = "KO_DOCKER_REPO"
-	magetasksImageBasename          = "IMAGE_BASENAME"
-	magetasksImageBasenameSeparator = "IMAGE_BASENAME_SEPARATOR"
-)
+const koPublishResult = "ko.publish.result"
 
 // KoPublisherConfigurator is used to configure the publish options for KO.
 type KoPublisherConfigurator func(*options.PublishOptions) error
@@ -73,27 +67,17 @@ func (kp KoPublisher) Publish(artifact config.Artifact, notifier config.Notifier
 }
 
 func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
-	if v, ok := os.LookupEnv(magetasksImageBasename); ok {
-		if _, ok2 := os.LookupEnv(koDockerRepo); !ok2 {
-			if err := os.Setenv(koDockerRepo, v); err != nil {
-				return nil, err
-			}
-		}
-	}
 	opts := &options.PublishOptions{
-		BaseImportPaths: true,
-		Push:            true,
+		DockerRepo: artifactimage.BaseName(),
+		Push:       true,
+		ImageNamer: customSeparatorImageNamer{
+			artifactimage.BaseNameSeparator(),
+		}.name,
 	}
 	if ver := config.Actual().Version; ver != nil {
 		if err := resolveTags(opts, ver.Resolver); err != nil {
 			return nil, err
 		}
-	}
-	if v, ok := os.LookupEnv(magetasksImageBasenameSeparator); ok {
-		opts.ImageNamer = customSeparatorImageNamer{v}.name
-	}
-	if v, ok := os.LookupEnv(koDockerRepo); ok {
-		opts.DockerRepo = v
 	}
 	for _, configurator := range kp.Configurators {
 		if err := configurator(opts); err != nil {
@@ -104,7 +88,7 @@ func (kp KoPublisher) publishOptions() (*options.PublishOptions, error) {
 }
 
 func resolveTags(opts *options.PublishOptions, resolver version.Resolver) error {
-	tags, err := pkgimage.Tags(resolver)
+	tags, err := artifactimage.Tags(resolver)
 	if err != nil {
 		return err
 	}

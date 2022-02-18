@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/wavesoftware/go-magetasks/pkg/artifact/image"
 	"github.com/wavesoftware/go-magetasks/pkg/environment"
 	"github.com/wavesoftware/go-magetasks/pkg/git"
-	"github.com/wavesoftware/go-magetasks/pkg/image"
 	"github.com/wavesoftware/go-magetasks/pkg/knative"
 	"github.com/wavesoftware/go-magetasks/pkg/strings"
 	"github.com/wavesoftware/go-magetasks/pkg/testing/errors"
