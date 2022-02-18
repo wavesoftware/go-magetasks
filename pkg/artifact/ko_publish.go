@@ -16,10 +16,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
-const (
-	koPublishResult                 = "ko.publish.result"
-	magetasksImageBasenameSeparator = "IMAGE_BASENAME_SEPARATOR"
-)
+const koPublishResult = "ko.publish.result"
 
 // KoPublisherConfigurator is used to configure the publish options for KO.
 type KoPublisherConfigurator func(*options.PublishOptions) error

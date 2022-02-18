@@ -4,7 +4,6 @@
 package main
 
 import (
-
 	// mage:import
 	"github.com/wavesoftware/go-magetasks"
 	"github.com/wavesoftware/go-magetasks/config"

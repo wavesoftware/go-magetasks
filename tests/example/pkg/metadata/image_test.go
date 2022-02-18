@@ -8,6 +8,6 @@ import (
 )
 
 func TestImagePath(t *testing.T) {
-	p := metadata.ImagePath()
+	p := metadata.ImagePath(metadata.SampleImage)
 	assert.Check(t, len(p) > 2)
 }
