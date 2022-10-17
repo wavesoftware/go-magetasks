@@ -3,7 +3,7 @@ package artifact
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 
@@ -173,7 +173,7 @@ func lookForGoModule(dir string) (lookupGoModuleResult, error) {
 			rs.directoryDistance++
 			continue
 		}
-		bytes, err := ioutil.ReadFile(modFile)
+		bytes, err := os.ReadFile(modFile)
 		if err != nil {
 			return rs, err
 		}

@@ -1,5 +1,4 @@
 //go:build mage
-// +build mage
 
 package main
 
@@ -14,7 +13,7 @@ import (
 	"github.com/wavesoftware/go-magetasks/pkg/checks"
 	"github.com/wavesoftware/go-magetasks/pkg/image"
 	"github.com/wavesoftware/go-magetasks/pkg/knative"
-	"github.com/wavesoftware/go-magetasks/tests/example/overrides"
+	"github.com/wavesoftware/go-magetasks/tests/example/build/overrides"
 	"github.com/wavesoftware/go-magetasks/tests/example/pkg/metadata"
 )
 

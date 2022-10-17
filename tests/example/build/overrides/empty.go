@@ -1,3 +1,4 @@
+// Package overrides contains overrides for the project.
 package overrides
 
 import "github.com/wavesoftware/go-magetasks/config"
