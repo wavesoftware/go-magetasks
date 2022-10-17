@@ -1,3 +1,4 @@
+// Dummy command
 package main
 
 import (

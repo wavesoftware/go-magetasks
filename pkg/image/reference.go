@@ -34,7 +34,8 @@ func (r InfluenceableReference) Operation() buildvars.Operation {
 }
 
 func environmentOverrideImageReference(
-	envVariable string, fallbackResolver config.Resolver) config.Resolver {
+	envVariable string, fallbackResolver config.Resolver,
+) config.Resolver {
 	return func() string {
 		if val, ok := os.LookupEnv(envVariable); ok {
 			return val

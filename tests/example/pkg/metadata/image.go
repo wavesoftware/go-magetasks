@@ -1,3 +1,4 @@
+// Package metadata contains meta information about the project.
 package metadata
 
 import (

@@ -28,6 +28,7 @@ linters:
     - deadcode
     - gochecknoglobals
     - wrapcheck
+    - exhaustruct
 
 issues:
   exclude-rules:

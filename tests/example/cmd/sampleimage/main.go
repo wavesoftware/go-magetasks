@@ -1,3 +1,4 @@
+// Sampleimage command
 package main
 
 import (

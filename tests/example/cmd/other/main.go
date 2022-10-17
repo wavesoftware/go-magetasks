@@ -1,3 +1,4 @@
+// Other command
 package main
 
 import (
