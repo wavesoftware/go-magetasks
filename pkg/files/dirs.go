@@ -7,11 +7,11 @@ import (
 	"sync"
 
 	"github.com/magefile/mage/mg"
+	rand "github.com/thanhpk/randstr"
 	"github.com/wavesoftware/go-ensure"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/dotenv"
 	"github.com/wavesoftware/go-magetasks/pkg/output"
-	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 const randomDirLength = 12

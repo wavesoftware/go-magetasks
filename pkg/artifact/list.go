@@ -48,7 +48,9 @@ func (l ListPublisher) Publish(artifact config.Artifact, notifier config.Notifie
 			"%w: can't find result for %v", ErrMisconfiguration, artifact)}
 	}
 
-	f, err := os.OpenFile(reportPath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, allowReadAllOsPerm)
+	//nolint:nosnakecase
+	flgs := os.O_APPEND | os.O_WRONLY | os.O_CREATE
+	f, err := os.OpenFile(reportPath, flgs, allowReadAllOsPerm)
 	defer func() {
 		if f != nil {
 			_ = f.Close()

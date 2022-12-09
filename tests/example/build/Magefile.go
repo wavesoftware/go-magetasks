@@ -18,6 +18,7 @@ import (
 )
 
 // Default target is set to Build
+//
 //goland:noinspection GoUnusedGlobalVariable
 var Default = magetasks.Build
 
