@@ -1,3 +1,5 @@
+//go:build e2e
+
 package tests_test
 
 import (
@@ -23,26 +25,47 @@ func TestProjectBuild(t *testing.T) {
 func execCmd(tb testing.TB, dir, name string, args ...string) {
 	tb.Helper()
 	c := exec.Command(name, args...)
-	c.Env = env(func(e string) bool {
-		return e == "GOARCH" || e == "GOOS" || e == "GOARM"
-	})
+	c.Env = append(
+		env(filterOutByName{names: []string{"GOOS"}}),
+		"GOTRACEBACK=all",
+	)
 	c.Dir = dir
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
-	err := c.Run()
-	assert.NilError(tb, err)
+	assert.NilError(tb, c.Start())
+	tb.Logf("Started `%q` with pid %d",
+		append([]string{name}, args...),
+		c.Process.Pid)
+	assert.NilError(tb, c.Wait())
 }
 
-func env(filter func(string) bool) []string {
+func env(filter envFilter) []string {
 	ret := make([]string, 0, len(os.Environ()))
 	for _, e := range os.Environ() {
 		envPair := strings.SplitN(e, "=", 2)
 		key := envPair[0]
-		if filter(key) {
+		if !filter.include(key) {
 			continue
 		}
 
 		ret = append(ret, e)
 	}
 	return ret
+}
+
+type filterOutByName struct {
+	names []string
+}
+
+func (f filterOutByName) include(name string) bool {
+	for _, n := range f.names {
+		if name == n {
+			return false
+		}
+	}
+	return true
+}
+
+type envFilter interface {
+	include(name string) bool
 }

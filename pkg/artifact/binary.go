@@ -106,7 +106,7 @@ func (b Binary) buildForPlatform(
 	))
 	err := sh.RunWithV(env, "go", args...)
 	if err != nil {
-		err = fmt.Errorf("%w: %v", ErrGoBuildFailed, err)
+		err = fmt.Errorf("%w: %w", ErrGoBuildFailed, err)
 	}
 	return binary, err
 }

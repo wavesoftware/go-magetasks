@@ -11,6 +11,8 @@ import (
 
 const golangciLintName = "golangci-lint"
 
+type GolangCiLintParam func(*GolangCiLintOptions)
+
 // GolangCiLintOptions contains options for GolangCi Lint.
 type GolangCiLintOptions struct {
 	// New when set will check only new code.
@@ -18,11 +20,24 @@ type GolangCiLintOptions struct {
 
 	// Fix when set will try to fix issues.
 	Fix bool
+
+	// Version is a version of golangci-lint to use.
+	Version string
+}
+
+func (o GolangCiLintOptions) effectiveVersion() string {
+	if o.Version != "" {
+		return o.Version
+	}
+	return "latest"
 }
 
 // GolangCiLint will configure golangci-lint in the build.
-func GolangCiLint() config.Task {
+func GolangCiLint(params ...GolangCiLintParam) config.Task {
 	opts := GolangCiLintOptions{}
+	for _, p := range params {
+		p(&opts)
+	}
 	return GolangCiLintWithOptions(opts)
 }
 
@@ -34,6 +49,9 @@ func GolangCiLintWithOptions(opts GolangCiLintOptions) config.Task {
 		Operation: func(notifier config.Notifier) error {
 			return golangCiLint(opts, notifier)
 		},
+		Overrides: []config.Configurator{
+			config.NewBinaries("golangci/golangci-lint@" + opts.effectiveVersion()),
+		},
 	}
 }
 
@@ -41,12 +59,6 @@ func golangCiLint(opts GolangCiLintOptions, notifier config.Notifier) error {
 	configFiles := []string{".golangci.yaml", ".golangci.yml"}
 	if configFilesMissing(configFiles) {
 		skipBecauseOfMissingConfig(notifier, configFiles)
-		return nil
-	}
-	if !files.ExecutableAvailable(golangciLintName) {
-		skipBecauseOf(notifier,
-			fmt.Sprintf("%s executable isn't available on system PATH's."+
-				" Skipping.", golangciLintName))
 		return nil
 	}
 
@@ -58,7 +70,8 @@ func golangCiLint(opts GolangCiLintOptions, notifier config.Notifier) error {
 		args = append(args, "--new")
 	}
 	args = append(args, "./...")
-	return sh.RunV(golangciLintName, args...)
+	cmd := fmt.Sprintf("%s/tools/golangci-lint", files.BuildDir())
+	return sh.RunV(cmd, args...)
 }
 
 func configFilesMissing(configFiles []string) bool {

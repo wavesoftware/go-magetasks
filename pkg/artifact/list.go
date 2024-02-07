@@ -57,12 +57,12 @@ func (l ListPublisher) Publish(artifact config.Artifact, notifier config.Notifie
 		}
 	}()
 	if err != nil {
-		return config.Result{Error: fmt.Errorf("%w: %v", ErrMisconfiguration, err)}
+		return config.Result{Error: fmt.Errorf("%w: %w", ErrMisconfiguration, err)}
 	}
 
 	for _, artifactPath := range artifactsList {
 		if _, err = f.WriteString(fmt.Sprintf("%s\n", artifactPath)); err != nil {
-			return config.Result{Error: fmt.Errorf("%w: %v", ErrMisconfiguration, err)}
+			return config.Result{Error: fmt.Errorf("%w: %w", ErrMisconfiguration, err)}
 		}
 	}
 

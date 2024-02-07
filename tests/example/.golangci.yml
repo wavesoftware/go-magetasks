@@ -29,6 +29,7 @@ linters:
     - gochecknoglobals
     - wrapcheck
     - exhaustruct
+    - depguard
 
 issues:
   exclude-rules:
@@ -43,3 +44,4 @@ linters-settings:
     replace-allow-list:
         # FIXME: remove after https://github.com/google/ko/issues/476
       - github.com/google/ko
+      - knative.dev/client-pkg

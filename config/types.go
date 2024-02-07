@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 
-	"github.com/fatih/color"
 	"github.com/wavesoftware/go-magetasks/pkg/version"
 )
 
@@ -18,12 +17,12 @@ type Config struct {
 	// Version contains the version information.
 	*Version
 
-	// MageTag holds default mage tag settings.
-	MageTag
-
-	// Dependencies will hold additional Golang dependencies that needs to be
-	// installed before running tasks.
-	Dependencies Dependencies
+	// Dependencies will hold additional Golang and pre-compiled dependencies
+	// that needs to be installed before running tasks.
+	Dependencies struct {
+		Golang Dependencies
+		Binaries
+	}
 
 	// Artifacts holds a list of artifacts to be built.
 	Artifacts []Artifact
@@ -78,12 +77,6 @@ func StaticResolver(value string) Resolver {
 	return func() string {
 		return value
 	}
-}
-
-// MageTag holds a mage tag.
-type MageTag struct {
-	Color color.Attribute
-	Label string
 }
 
 // Result hold a result of an Artifact build or publish.

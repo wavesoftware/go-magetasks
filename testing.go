@@ -1,20 +1,21 @@
 package magetasks
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/files"
 	"github.com/wavesoftware/go-magetasks/pkg/ldflags"
+	"github.com/wavesoftware/go-magetasks/pkg/targets"
 	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
 // Test will execute regular unit tests.
-func Test() {
-	mg.Deps(Check, files.EnsureBuildDir)
+func Test(ctx context.Context) {
+	targets.Deps(ctx, Check)
 	t := tasks.Start("✅", "Testing", true)
 	args := []string{
 		"--format", "testname",

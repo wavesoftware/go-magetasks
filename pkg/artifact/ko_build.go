@@ -147,7 +147,7 @@ func calculateImageReference(result build.Result, artifact config.Artifact) (*im
 
 func resultErrKoFailed(err error) config.Result {
 	return config.Result{
-		Error: fmt.Errorf("%w: %v", ErrKoFailed, err),
+		Error: fmt.Errorf("%w: %w", ErrKoFailed, err),
 	}
 }
 

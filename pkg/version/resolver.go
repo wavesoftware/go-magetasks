@@ -39,7 +39,7 @@ func CompatibleRanges(resolver Resolver) ([]string, error) {
 	}
 	sv, err := semver.ParseTolerant(v)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrVersionIsNotValid, err)
+		return nil, fmt.Errorf("%w: %w", ErrVersionIsNotValid, err)
 	}
 	if len(sv.Pre) == 0 && len(sv.Build) == 0 {
 		return collect(

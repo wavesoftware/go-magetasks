@@ -1,7 +1,7 @@
 package environment_test
 
 import (
-	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/wavesoftware/go-magetasks/pkg/environment"
@@ -22,7 +22,7 @@ func TestVersionResolver(t *testing.T) {
 	}}
 	for i, tc := range tests {
 		tc := tc
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			resolver := tc.resolver()
 			assert.Equal(t, resolver.Version(), tc.version)
 			_, err := resolver.IsLatest(version.AnyVersion)
