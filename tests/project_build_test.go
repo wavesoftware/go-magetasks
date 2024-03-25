@@ -17,25 +17,41 @@ func TestProjectBuild(t *testing.T) {
 	if testing.Short() {
 		t.Skip("short tests only")
 	}
-	execCmd(t, "./example", "./mage", "clean", "build")
-	execCmd(t, "./example/build/_output/bin", fmt.Sprintf("./other-%s-%s",
-		runtime.GOOS, runtime.GOARCH))
+	c := mkCmd("./example", "./mage", "clean", "build")
+	assertCommandStarted(t, c)
+	assertCommandSucceded(t, c)
+	c = mkCmd("./example/build/_output/bin",
+		fmt.Sprintf("./other-%s-%s", runtime.GOOS, runtime.GOARCH))
+	assertCommandStarted(t, c)
+	assertCommandSucceded(t, c)
 }
 
-func execCmd(tb testing.TB, dir, name string, args ...string) {
-	tb.Helper()
+func mkCmd(dir, name string, args ...string) *exec.Cmd {
 	c := exec.Command(name, args...)
 	c.Env = append(
-		env(filterOutByName{names: []string{"GOOS"}}),
+		env(filterOutByName{names: []string{"GOOS", "GOARCH", "GOARM"}}),
 		"GOTRACEBACK=all",
 	)
 	c.Dir = dir
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
+	return c
+}
+
+func assertCommandStarted(tb testing.TB, c *exec.Cmd) {
+	tb.Helper()
 	assert.NilError(tb, c.Start())
 	tb.Logf("Started `%q` with pid %d",
-		append([]string{name}, args...),
+		append([]string{c.Path}, c.Args...),
 		c.Process.Pid)
+	tb.Log("Process env:")
+	for _, e := range c.Env {
+		tb.Logf(" * %s", e)
+	}
+}
+
+func assertCommandSucceded(tb testing.TB, c *exec.Cmd) {
+	tb.Helper()
 	assert.NilError(tb, c.Wait())
 }
 

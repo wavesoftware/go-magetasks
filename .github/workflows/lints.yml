@@ -6,14 +6,21 @@ on:
     branches:
       - master
   pull_request:
+
+env:
+  FORCE_COLOR: true
+
 jobs:
   golangci:
     name: Golangci
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: false
+      - uses: golangci/golangci-lint-action@v4
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: v1.55.2
@@ -21,9 +28,8 @@ jobs:
     name: EditorConfig
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: ECLint
-        uses: snow-actions/eclint@v1.0.1
+      - uses: actions/checkout@v4
+      - uses: snow-actions/eclint@v1.0.1
         with:
           args: check
 

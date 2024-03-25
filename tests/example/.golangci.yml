@@ -36,12 +36,3 @@ issues:
     - path: _test\.go
       linters:
         - wrapcheck
-
-
-linters-settings:
-  gomoddirectives:
-    # List of allowed `replace` directives. Default is empty.
-    replace-allow-list:
-        # FIXME: remove after https://github.com/google/ko/issues/476
-      - github.com/google/ko
-      - knative.dev/client-pkg
