@@ -5,10 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/magefile/mage/mg"
 	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/artifact"
-	"github.com/wavesoftware/go-magetasks/pkg/files"
+	"github.com/wavesoftware/go-magetasks/pkg/targets"
 	"github.com/wavesoftware/go-magetasks/pkg/tasks"
 )
 
@@ -16,19 +15,25 @@ import (
 var ErrNoBuilderForArtifact = errors.New("no builder for artifact found")
 
 // Build will build project artifacts, binaries and images.
-func Build() {
-	mg.Deps(Test, files.EnsureBuildDir)
+func Build(ctx context.Context) error {
+	targets.Deps(ctx, Test)
 	t := tasks.Start("🔨", "Building", len(config.Actual().Artifacts) > 0)
 	for _, art := range config.Actual().Artifacts {
 		p := t.Part(fmt.Sprintf("%s %s", art.GetType(), art.GetName()))
 		pp := p.Starting()
 
-		buildArtifact(art, pp)
+		err := buildArtifact(art, pp)
+		if err != nil {
+			t.End(err)
+			return err
+		}
 	}
 	t.End()
+
+	return nil
 }
 
-func buildArtifact(art config.Artifact, pp tasks.PartProcessing) {
+func buildArtifact(art config.Artifact, pp tasks.PartProcessing) error {
 	found := false
 	for _, builder := range config.Actual().Builders {
 		if !builder.Accepts(art) {
@@ -37,8 +42,9 @@ func buildArtifact(art config.Artifact, pp tasks.PartProcessing) {
 		found = true
 		result := builder.Build(art, pp)
 		if result.Failed() {
-			pp.Done(result.Error)
-			return
+			err := result.Error
+			pp.Done(err)
+			return err
 		}
 		config.WithContext(func(ctx context.Context) context.Context {
 			return context.WithValue(ctx, artifact.BuildKey(art), result)
@@ -49,4 +55,5 @@ func buildArtifact(art config.Artifact, pp tasks.PartProcessing) {
 		err = ErrNoBuilderForArtifact
 	}
 	pp.Done(err)
+	return err
 }

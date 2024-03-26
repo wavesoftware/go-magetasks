@@ -5,7 +5,6 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/wavesoftware/go-ensure"
-	"github.com/wavesoftware/go-magetasks/config"
 	"github.com/wavesoftware/go-magetasks/pkg/output"
 	"github.com/wavesoftware/go-magetasks/pkg/output/color"
 )
@@ -28,7 +27,7 @@ type Part struct {
 // PartProcessing is an interface that is used to process long running part of
 // tasks.
 type PartProcessing interface {
-	config.Notifier
+	Notify(status string)
 	Done(err error)
 }
 

@@ -19,14 +19,14 @@ type IsLatestResolver func(version semver.Version, versionRange semver.Range) (b
 func IsLatest(version, versionRange string, resolver IsLatestResolver) (bool, error) {
 	sver, err := semver.ParseTolerant(version)
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", ErrVersionIsNotValid, err)
+		return false, fmt.Errorf("%w: %w", ErrVersionIsNotValid, err)
 	}
 	if versionRange == "" {
 		versionRange = AnyVersion
 	}
 	verRange, err := semver.ParseRange(versionRange)
 	if err != nil {
-		return false, fmt.Errorf("%w: %v", ErrRangeIsNotValid, err)
+		return false, fmt.Errorf("%w: %w", ErrRangeIsNotValid, err)
 	}
 	if !verRange(sver) {
 		return false, fmt.Errorf("%w: %#v is outside of %#v",
@@ -52,7 +52,7 @@ func IsLatestGivenReleases(
 				if skipInvalidReleases {
 					continue
 				}
-				return false, fmt.Errorf("%w: %v", ErrVersionIsNotValid, err)
+				return false, fmt.Errorf("%w: %w", ErrVersionIsNotValid, err)
 			}
 			if !versionRange(sr) {
 				continue

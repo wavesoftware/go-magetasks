@@ -15,8 +15,8 @@ import (
 var ErrNoPublisherForArtifact = errors.New("no publisher for artifact found")
 
 // Publish will publish built artifacts to remote site.
-func Publish() {
-	mg.Deps(Build)
+func Publish(ctx context.Context) {
+	mg.CtxDeps(ctx, Build)
 	artifacts := config.Actual().Artifacts
 	t := tasks.Start("📤", "Publishing", len(artifacts) > 0)
 	for _, art := range artifacts {

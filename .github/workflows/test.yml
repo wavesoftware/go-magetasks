@@ -7,6 +7,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+env:
+  FORCE_COLOR: true
+
 jobs:
 
   build:
@@ -15,20 +18,32 @@ jobs:
     strategy:
       matrix:
         go-version:
-          - '1.18'
-          - '1.19'
+          - '1.22'
+          - '1.21'
     steps:
 
     - name: Set up Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go-version }}
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Test
-      run: go test -v -count=1 -race ./...
-      env:
-        FORCE_COLOR: true
+    - name: Test unit
+      run: go run gotest.tools/gotestsum@latest 
+        --format testname --
+        -count=1 
+        -race 
+        -timeout=5m
+        -short 
+        ./...
+
+    - name: Test e2e
+      run: go run gotest.tools/gotestsum@latest
+        --format testname --
+        -tags=e2e
+        -count=1
+        -timeout=10m
+        ./tests/...

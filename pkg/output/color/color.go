@@ -10,9 +10,9 @@ var (
 	// Red text color.
 	Red = color.New(color.FgHiRed).Add(color.Bold).SprintFunc()
 	// Green text color.
-	Green = color.New(color.FgHiGreen).Add(color.Bold).SprintFunc()
+	Green = color.New(color.FgGreen).Add(color.Bold).SprintFunc()
 	// Yellow text color.
-	Yellow = color.New(color.FgHiYellow).Add(color.Bold).SprintFunc()
+	Yellow = color.New(color.FgYellow).SprintFunc()
 	// Blue text color.
 	Blue = color.New(color.FgBlue).SprintFunc()
 )

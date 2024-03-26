@@ -2,8 +2,6 @@ package config
 
 import (
 	"context"
-
-	"github.com/fatih/color"
 )
 
 var (
@@ -18,15 +16,11 @@ func FillInDefaultValues(cfg Config) Config {
 	if len(cfg.BuildDirPath) == 0 {
 		cfg.BuildDirPath = []string{"build", "_output"}
 	}
-	empty := &MageTag{}
-	if cfg.MageTag == *empty {
-		cfg.MageTag = MageTag{
-			Color: color.FgCyan,
-			Label: "[MAGE]",
-		}
+	if cfg.Dependencies.Golang == nil {
+		cfg.Dependencies.Golang = NewDependencies("gotest.tools/gotestsum@latest")
 	}
-	if cfg.Dependencies == nil {
-		cfg.Dependencies = NewDependencies("gotest.tools/gotestsum@latest")
+	if cfg.Dependencies.Binaries == nil {
+		cfg.Dependencies.Binaries = NewBinaries()
 	}
 	if cfg.Context == nil {
 		cfg.Context = context.TODO()

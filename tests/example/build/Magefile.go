@@ -69,7 +69,9 @@ func init() { //nolint:gochecknoinits
 			dummy, sampleimage, other,
 		},
 		Checks: []config.Task{
-			checks.GolangCiLint(),
+			checks.GolangCiLint(func(opts *checks.GolangCiLintOptions) {
+				opts.Version = "v1.55.2"
+			}),
 			checks.Revive(),
 			checks.Staticcheck(),
 		},

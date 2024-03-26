@@ -48,7 +48,7 @@ func (e VersionResolver) Version() string {
 	return string(values[e.VersionKey])
 }
 
-func (e VersionResolver) IsLatest(versionRange string) (bool, error) {
+func (e VersionResolver) IsLatest(_ string) (bool, error) {
 	return false, fmt.Errorf(
 		"%w: IsLatest(versionRange string) by environment.VersionResolver",
 		ErrNotSupported)

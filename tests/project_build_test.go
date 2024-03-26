@@ -1,3 +1,5 @@
+//go:build e2e
+
 package tests_test
 
 import (
@@ -15,34 +17,71 @@ func TestProjectBuild(t *testing.T) {
 	if testing.Short() {
 		t.Skip("short tests only")
 	}
-	execCmd(t, "./example", "./mage", "clean", "build")
-	execCmd(t, "./example/build/_output/bin", fmt.Sprintf("./other-%s-%s",
-		runtime.GOOS, runtime.GOARCH))
+	c := mkCmd("./example", "./mage", "clean", "build")
+	assertCommandStarted(t, c)
+	assertCommandSucceded(t, c)
+	c = mkCmd("./example/build/_output/bin",
+		fmt.Sprintf("./other-%s-%s", runtime.GOOS, runtime.GOARCH))
+	assertCommandStarted(t, c)
+	assertCommandSucceded(t, c)
 }
 
-func execCmd(tb testing.TB, dir, name string, args ...string) {
-	tb.Helper()
+func mkCmd(dir, name string, args ...string) *exec.Cmd {
 	c := exec.Command(name, args...)
-	c.Env = env(func(e string) bool {
-		return e == "GOARCH" || e == "GOOS" || e == "GOARM"
-	})
+	c.Env = append(
+		env(filterOutByName{names: []string{"GOOS", "GOARCH", "GOARM"}}),
+		"GOTRACEBACK=all",
+	)
 	c.Dir = dir
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
-	err := c.Run()
-	assert.NilError(tb, err)
+	return c
 }
 
-func env(filter func(string) bool) []string {
+func assertCommandStarted(tb testing.TB, c *exec.Cmd) {
+	tb.Helper()
+	assert.NilError(tb, c.Start())
+	tb.Logf("Started `%q` with pid %d",
+		append([]string{c.Path}, c.Args...),
+		c.Process.Pid)
+	tb.Log("Process env:")
+	for _, e := range c.Env {
+		tb.Logf(" * %s", e)
+	}
+}
+
+func assertCommandSucceded(tb testing.TB, c *exec.Cmd) {
+	tb.Helper()
+	assert.NilError(tb, c.Wait())
+}
+
+func env(filter envFilter) []string {
 	ret := make([]string, 0, len(os.Environ()))
 	for _, e := range os.Environ() {
 		envPair := strings.SplitN(e, "=", 2)
 		key := envPair[0]
-		if filter(key) {
+		if !filter.include(key) {
 			continue
 		}
 
 		ret = append(ret, e)
 	}
 	return ret
+}
+
+type filterOutByName struct {
+	names []string
+}
+
+func (f filterOutByName) include(name string) bool {
+	for _, n := range f.names {
+		if name == n {
+			return false
+		}
+	}
+	return true
+}
+
+type envFilter interface {
+	include(name string) bool
 }
