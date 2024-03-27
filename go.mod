@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cardil/ghet v0.0.1-0.20240326133720-fccab8f3066e
+	github.com/cardil/ghet v0.0.1-0.20240327122721-f64bf4f053e1
 	github.com/fatih/color v1.16.0
 	github.com/google/go-containerregistry v0.19.1
 	github.com/google/ko v0.15.2
@@ -120,7 +120,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-localereader v0.0.1 // indirect
+	github.com/mattn/go-localereader v0.0.2-0.20220822084749-2491eb6c1c75 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -193,8 +193,8 @@ require (
 	k8s.io/apimachinery v0.29.3 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/utils v0.0.0-20240310230437-4693a0247e57 // indirect
-	knative.dev/client-pkg v0.0.0-20240326133606-ca64d2dc74eb // indirect
-	knative.dev/pkg v0.0.0-20240318073042-db6f3b074e8c // indirect
+	knative.dev/client-pkg v0.0.0-20240327103736-fbd71a85a0ff // indirect
+	knative.dev/pkg v0.0.0-20240325103648-fd7cc2153e6a // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/kind v0.22.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
