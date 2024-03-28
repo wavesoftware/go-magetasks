@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cardil/ghet v0.0.1-0.20240327122721-f64bf4f053e1
+	github.com/cardil/ghet v0.0.1-0.20240328141807-46c5078274de
 	github.com/fatih/color v1.16.0
 	github.com/google/go-containerregistry v0.19.1
 	github.com/google/ko v0.15.2
@@ -193,7 +193,7 @@ require (
 	k8s.io/apimachinery v0.29.3 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/utils v0.0.0-20240310230437-4693a0247e57 // indirect
-	knative.dev/client-pkg v0.0.0-20240327103736-fbd71a85a0ff // indirect
+	knative.dev/client-pkg v0.0.0-20240328140606-2dec0683c965 // indirect
 	knative.dev/pkg v0.0.0-20240325103648-fd7cc2153e6a // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/kind v0.22.0 // indirect
