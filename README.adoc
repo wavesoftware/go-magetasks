@@ -1,3 +1,5 @@
 = A general purpose, reusable Mage tasks
 
 This repo holds a list of reusable Mage tasks to be used in other projects.
+
+== Announcement: This repo isn't maintained anymore. The code have been handed over to Knative project. New home is: https://pkg.go.dev/knative.dev/toolbox/magetasks[knative.dev/toolbox/magetasks].
